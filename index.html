@@ -15,15 +15,12 @@
     --gold:    #c8a84b;
     --gold2:   #e8c96b;
     --red:     #c0392b;
-    --blue:    #2e6da4;
     --text:    #d4c9a8;
     --muted:   #4a6355;
     --card-bg: #f5f0e8;
     --card-sh: rgba(0,0,0,.45);
     --cw: 48px;
     --ch: 68px;
-    --fu: 32px;
-    --fd: 17px;
   }
 
   html { background: var(--felt); }
@@ -41,7 +38,6 @@
     margin: 0 auto;
   }
 
-  /* ── title ── */
   h1 {
     font-family: 'Cormorant Garamond', serif;
     font-size: clamp(18px, 3vw, 26px);
@@ -54,75 +50,74 @@
     text-shadow: 0 0 40px rgba(200,168,75,.3);
   }
   .subtitle {
-    text-align: center;
-    font-size: 10px;
-    color: var(--muted);
-    letter-spacing: .2em;
+    text-align: center; font-size: 10px;
+    color: var(--muted); letter-spacing: .2em;
     margin-bottom: 14px;
   }
 
-  /* ── balance bar ── */
-  .bar-row {
-    display: flex; align-items: center; gap: 10px;
-    margin-bottom: 4px;
-  }
-  .bar-score {
-    font-size: 13px; font-weight: 700; width: 32px;
-    flex-shrink: 0;
-  }
+  /* balance bar */
+  .bar-row { display: flex; align-items: center; gap: 10px; margin-bottom: 4px; }
+  .bar-score { font-size: 13px; font-weight: 700; width: 32px; flex-shrink: 0; }
   .bar-score.a { color: #e05555; text-align: right; }
   .bar-score.b { color: #5b9bd5; }
   .bar-track {
-    flex: 1; height: 6px;
-    background: #0d1f16;
-    border-radius: 99px;
-    overflow: hidden;
-    border: 1px solid var(--border);
-    position: relative;
+    flex: 1; height: 6px; background: #0d1f16;
+    border-radius: 99px; overflow: hidden;
+    border: 1px solid var(--border); position: relative;
   }
   .bar-fill {
-    position: absolute; inset: 0;
-    width: 50%;
+    position: absolute; inset: 0; width: 50%;
     background: linear-gradient(90deg, #e05555, #c8703a);
     border-radius: 99px;
     transition: width .5s cubic-bezier(.4,0,.2,1);
   }
   .bar-mid {
     position: absolute; left: 50%; top: -3px; bottom: -3px;
-    width: 2px; background: #1a3d26;
-    transform: translateX(-50%);
+    width: 2px; background: #1a3d26; transform: translateX(-50%);
   }
   .bar-label {
-    text-align: center; font-size: 10px;
-    color: var(--muted); letter-spacing: .1em;
-    margin-bottom: 14px; height: 14px;
+    text-align: center; font-size: 10px; color: var(--muted);
+    letter-spacing: .1em; margin-bottom: 14px; height: 14px;
   }
   .bar-label.eq { color: #4caf7d; }
 
-  /* ── draw zone ── */
-  .draw-zone {
-    display: flex; justify-content: center; align-items: flex-end; gap: 18px;
-    margin-bottom: 16px;
+  /* stock zone */
+  .stock-zone {
+    display: flex; justify-content: center; align-items: center;
+    gap: 14px; margin-bottom: 16px;
   }
-  .draw-group { display: flex; flex-direction: column; align-items: center; gap: 5px; }
-  .draw-label { font-size: 9px; letter-spacing: .18em; color: var(--muted); }
-  .draw-label.active { color: var(--gold); }
-  .draw-sub { font-size: 9px; color: var(--muted); }
+  .stock-wrap { display: flex; flex-direction: column; align-items: center; gap: 5px; }
+  .stock-label { font-size: 9px; letter-spacing: .18em; color: var(--muted); }
+  .stock-btn {
+    width: var(--cw); height: var(--ch);
+    border-radius: 5px; cursor: pointer; border: 1.5px solid;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 20px; transition: border-color .15s, box-shadow .15s;
+  }
+  .stock-btn.has-cards {
+    background: repeating-linear-gradient(135deg,#0d2518 0,#0d2518 8px,#0a1c13 8px,#0a1c13 16px);
+    border-color: rgba(200,168,75,.35);
+    box-shadow: 0 2px 8px rgba(0,0,0,.4);
+  }
+  .stock-btn.empty { background: transparent; border-color: var(--border); color: var(--muted); }
+  .stock-meta { font-size: 9px; color: var(--muted); text-align: center; }
 
-  /* ── boards ── */
-  .boards {
-    display: flex; gap: 14px; align-items: flex-start;
+  .draw-hint {
+    display: flex; flex-direction: column; align-items: center; gap: 2px;
+    font-size: 9px; color: var(--muted); letter-spacing: .08em;
   }
-  @media (max-width: 680px) {
-    .boards { flex-direction: column; }
-  }
+  .draw-hint .arr { font-size: 20px; line-height: 1; opacity: .5; }
+
+  /* boards */
+  .boards { display: flex; gap: 14px; align-items: flex-start; }
+  @media (max-width: 680px) { .boards { flex-direction: column; } }
+
   .board {
     flex: 1; min-width: 0;
     background:
       repeating-linear-gradient(45deg, transparent, transparent 28px, rgba(255,255,255,.012) 28px, rgba(255,255,255,.012) 29px),
       var(--felt2);
-    border-radius: 10px;
-    padding: 12px 10px 16px;
+    border-radius: 10px; padding: 12px 10px 16px;
     display: flex; flex-direction: column; gap: 10px;
     transition: opacity .2s;
   }
@@ -130,185 +125,114 @@
   .board.b { border: 1.5px solid rgba(91,155,213,.3); }
   .board.dim { opacity: .45; }
 
-  .board-header {
-    display: flex; justify-content: space-between; align-items: center;
-  }
+  .board-header { display: flex; justify-content: space-between; align-items: center; }
   .board-name {
     font-family: 'Cormorant Garamond', serif;
-    font-size: 13px; letter-spacing: .3em;
-    font-style: italic;
+    font-size: 13px; letter-spacing: .3em; font-style: italic;
   }
   .board.a .board-name { color: #e05555; }
   .board.b .board-name { color: #5b9bd5; }
   .board-count { font-size: 10px; color: var(--muted); }
 
-  /* ── foundations ── */
+  /* top row inside board: foundations left, waste right */
+  .top-row {
+    display: flex; align-items: flex-end;
+    justify-content: space-between; gap: 8px;
+  }
   .foundations { display: flex; gap: 5px; }
 
-  /* ── columns ── */
-  .columns {
-    display: flex; gap: 5px;
-    align-items: flex-start;
-    min-height: 560px;
-  }
-  .col-wrap {
-    position: relative;
-    width: var(--cw);
-    flex-shrink: 0;
-  }
+  .waste-area { display: flex; flex-direction: column; align-items: center; gap: 3px; flex-shrink: 0; }
+  .waste-lbl { font-size: 8px; letter-spacing: .12em; color: var(--muted); white-space: nowrap; }
+  .waste-lbl.active { color: var(--gold); }
+  .waste-depth { font-size: 8px; color: var(--muted); text-align: center; min-height: 10px; }
 
-  /* ── cards ── */
+  /* columns */
+  .columns { display: flex; gap: 5px; align-items: flex-start; min-height: 560px; }
+  .col-wrap { position: relative; width: var(--cw); flex-shrink: 0; }
+
+  /* cards */
   .card {
-    position: absolute;
-    width: var(--cw); height: var(--ch);
-    border-radius: 5px;
-    cursor: pointer;
-    user-select: none;
+    position: absolute; width: var(--cw); height: var(--ch);
+    border-radius: 5px; cursor: pointer; user-select: none;
     -webkit-tap-highlight-color: transparent;
-    transition: box-shadow .1s, outline .1s, transform .08s;
+    transition: box-shadow .1s, transform .08s;
   }
   .card:active { transform: translateY(-1px); }
+  .card.inline { position: relative; display: flex; flex-shrink: 0; }
+
   .card.face-down {
-    background: repeating-linear-gradient(
-      135deg,
-      #0d2518 0, #0d2518 7px,
-      #0a1c13 7px, #0a1c13 14px
-    );
+    background: repeating-linear-gradient(135deg,#0d2518 0,#0d2518 7px,#0a1c13 7px,#0a1c13 14px);
     border: 1.5px solid rgba(200,168,75,.18);
   }
   .card.face-down::after {
-    content: '';
-    position: absolute; inset: 3px;
-    border: 1px solid rgba(200,168,75,.1);
-    border-radius: 3px;
+    content:''; position: absolute; inset: 3px;
+    border: 1px solid rgba(200,168,75,.1); border-radius: 3px;
   }
   .card.face-up {
-    background: var(--card-bg);
-    border: 1.5px solid #c8b99a;
+    background: var(--card-bg); border: 1.5px solid #c8b99a;
     box-shadow: 0 2px 6px var(--card-sh);
-    display: flex; flex-direction: column;
-    justify-content: space-between;
-    padding: 3px 4px;
-    font-family: 'Cormorant Garamond', serif;
-    font-size: 12px; font-weight: 700;
-    line-height: 1.15;
+    display: flex; flex-direction: column; justify-content: space-between;
+    padding: 3px 4px; font-family: 'Cormorant Garamond', serif;
+    font-size: 12px; font-weight: 700; line-height: 1.15;
   }
-  .card.face-up.red { color: var(--red); }
+  .card.face-up.red   { color: var(--red); }
   .card.face-up.black { color: #1a3d7c; }
   .card.face-up.selected {
-    background: #fffbef;
-    border-color: var(--gold);
+    background: #fffbef; border-color: var(--gold);
     box-shadow: 0 0 0 2px rgba(200,168,75,.5), 0 2px 8px var(--card-sh);
-    outline: none;
   }
   .card.face-up.selected-stack {
     box-shadow: 0 0 0 1px rgba(200,168,75,.3), 0 2px 6px var(--card-sh);
     background: #fffcf2;
   }
-  .card-top { }
   .card-center { text-align: center; font-size: 18px; line-height: 1; }
   .card-bot { text-align: right; transform: rotate(180deg); }
 
-  /* empty slot */
   .slot-empty {
-    position: relative;
     width: var(--cw); height: var(--ch);
-    border-radius: 5px;
-    border: 1.5px dashed;
-    cursor: pointer;
-    flex-shrink: 0;
-    display: flex; align-items: center; justify-content: center;
-    font-size: 18px;
-    font-family: 'Cormorant Garamond', serif;
+    border-radius: 5px; border: 1.5px dashed; cursor: pointer;
+    flex-shrink: 0; display: flex; align-items: center; justify-content: center;
+    font-size: 18px; font-family: 'Cormorant Garamond', serif;
     transition: border-color .15s;
   }
   .board.a .slot-empty { border-color: rgba(224,85,85,.3); color: rgba(224,85,85,.25); }
   .board.b .slot-empty { border-color: rgba(91,155,213,.3); color: rgba(91,155,213,.25); }
   .slot-empty:hover { border-color: rgba(200,168,75,.4); }
 
-  /* stock / waste */
-  .stock-card {
-    width: var(--cw); height: var(--ch);
-    border-radius: 5px;
-    cursor: pointer;
-    border: 1.5px solid;
-    display: flex; align-items: center; justify-content: center;
-    font-size: 20px;
-    transition: border-color .15s, box-shadow .15s;
-  }
-  .stock-card.has-cards {
-    background: repeating-linear-gradient(
-      135deg,
-      #0d2518 0, #0d2518 8px,
-      #0a1c13 8px, #0a1c13 16px
-    );
-    border-color: rgba(200,168,75,.35);
-    box-shadow: 0 2px 8px rgba(0,0,0,.4);
-  }
-  .stock-card.empty {
-    background: transparent;
-    border-color: var(--border);
-    color: var(--muted);
-  }
-  .stock-count { font-size: 9px; color: var(--muted); text-align: center; }
-
-  /* waste fan */
-  .waste-fan {
-    position: relative;
-    height: var(--ch);
-    min-width: var(--cw);
-  }
-
-  /* ── new game btn ── */
+  /* new game */
   .new-btn {
-    display: block; margin: 18px auto 0;
-    padding: 8px 28px;
-    background: transparent;
-    border: 1px solid var(--border);
-    border-radius: 4px;
-    color: var(--muted);
-    font-family: 'Courier Prime', monospace;
-    font-size: 11px; letter-spacing: .18em;
-    cursor: pointer;
-    transition: border-color .15s, color .15s;
-    text-transform: uppercase;
+    display: block; margin: 18px auto 0; padding: 8px 28px;
+    background: transparent; border: 1px solid var(--border); border-radius: 4px;
+    color: var(--muted); font-family: 'Courier Prime', monospace;
+    font-size: 11px; letter-spacing: .18em; cursor: pointer;
+    transition: border-color .15s, color .15s; text-transform: uppercase;
   }
   .new-btn:hover { border-color: var(--gold); color: var(--gold); }
 
-  /* ── win overlay ── */
+  /* win overlay */
   #win-overlay {
-    display: none;
-    position: fixed; inset: 0;
+    display: none; position: fixed; inset: 0;
     background: rgba(0,0,0,.88);
-    align-items: center; justify-content: center;
-    z-index: 999;
-    font-family: 'Cormorant Garamond', serif;
+    align-items: center; justify-content: center; z-index: 999;
   }
   #win-overlay.show { display: flex; }
   .win-box {
-    background: #08160e;
-    border: 2px solid var(--gold);
-    border-radius: 12px;
-    padding: 44px 52px;
-    text-align: center;
+    background: #08160e; border: 2px solid var(--gold);
+    border-radius: 12px; padding: 44px 52px; text-align: center;
     box-shadow: 0 0 80px rgba(200,168,75,.15);
+    font-family: 'Cormorant Garamond', serif;
   }
   .win-trophy { font-size: 52px; margin-bottom: 12px; }
   .win-title {
-    font-size: 28px; font-weight: 700;
-    color: var(--gold); letter-spacing: .3em; text-transform: uppercase;
-    margin-bottom: 8px;
+    font-size: 28px; font-weight: 700; color: var(--gold);
+    letter-spacing: .3em; text-transform: uppercase; margin-bottom: 8px;
   }
-  .win-moves { font-size: 13px; color: var(--muted); font-family: 'Courier Prime',monospace; margin-bottom: 28px; }
+  .win-moves { font-size: 13px; color: var(--muted); font-family:'Courier Prime',monospace; margin-bottom: 28px; }
   .win-btn {
-    padding: 10px 32px;
-    background: var(--gold);
-    border: none; border-radius: 6px;
-    color: #08160e;
-    font-family: 'Cormorant Garamond', serif;
+    padding: 10px 32px; background: var(--gold); border: none; border-radius: 6px;
+    color: #08160e; font-family: 'Cormorant Garamond', serif;
     font-size: 16px; font-weight: 700; letter-spacing: .15em;
-    cursor: pointer;
-    transition: background .15s;
+    cursor: pointer; transition: background .15s;
   }
   .win-btn:hover { background: var(--gold2); }
 </style>
@@ -328,23 +252,28 @@
 </div>
 <div class="bar-label" id="bar-label"></div>
 
-<div class="draw-zone">
-  <div class="draw-group">
-    <div class="draw-label" id="stock-label">PIOCHE</div>
-    <div class="stock-card has-cards" id="stock-btn" onclick="drawCards()">
+<div class="stock-zone">
+  <div class="draw-hint">
+    <span style="color:#e05555;font-size:9px;letter-spacing:.1em">NON</span>
+    <span class="arr">←</span>
+  </div>
+
+  <div class="stock-wrap">
+    <div class="stock-label">PIOCHE</div>
+    <div class="stock-btn has-cards" id="stock-btn" onclick="drawCards()">
       <span id="stock-icon"></span>
     </div>
-    <div class="stock-count" id="stock-count"></div>
+    <div class="stock-meta" id="stock-count">—</div>
+    <div class="stock-meta" id="moves-count">0 mvt</div>
   </div>
-  <div class="draw-group">
-    <div class="draw-label" id="waste-label">—</div>
-    <div class="waste-fan" id="waste-fan"></div>
-    <div class="stock-count" id="moves-count">0 mvt</div>
+
+  <div class="draw-hint">
+    <span style="color:#5b9bd5;font-size:9px;letter-spacing:.1em">OUI</span>
+    <span class="arr">→</span>
   </div>
 </div>
 
 <div class="boards" id="boards"></div>
-
 <button class="new-btn" onclick="newGame()">Nouvelle partie</button>
 
 <div id="win-overlay">
@@ -357,67 +286,42 @@
 </div>
 
 <script>
-// ── constants ──────────────────────────────────────────
 const SUITS  = ['♥','♦','♠','♣'];
 const VALUES = ['A','2','3','4','5','6','7','8','9','10','J','Q','K'];
 const RED    = new Set(['♥','♦']);
 let _id = 0;
 
-// ── helpers ────────────────────────────────────────────
 const mkCard = (suit, val) => ({
-  suit, val,
-  num: VALUES.indexOf(val) + 1,
-  red: RED.has(suit),
-  faceUp: false,
-  id: _id++,
+  suit, val, num: VALUES.indexOf(val)+1, red: RED.has(suit), faceUp: false, id: _id++
 });
-
 const shuffle = a => {
   const b = [...a];
-  for (let i = b.length-1; i > 0; i--) {
-    const j = 0|Math.random()*(i+1);
-    [b[i],b[j]] = [b[j],b[i]];
-  }
+  for (let i=b.length-1;i>0;i--){ const j=0|Math.random()*(i+1); [b[i],b[j]]=[b[j],b[i]]; }
   return b;
 };
-
-const mkDeck = () => shuffle(
-  SUITS.flatMap(s => VALUES.map(v => mkCard(s, v)))
-);
-
+const mkDeck = () => shuffle(SUITS.flatMap(s => VALUES.map(v => mkCard(s,v))));
 const deal = deck => {
-  const cols = Array.from({length:7}, () => []);
-  let i = 0;
-  for (let c = 0; c < 7; c++)
-    for (let r = 0; r <= c; r++)
-      cols[c].push({...deck[i++], faceUp: r === c});
+  const cols = Array.from({length:7},()=>[]);
+  let i=0;
+  for (let c=0;c<7;c++) for (let r=0;r<=c;r++) cols[c].push({...deck[i++], faceUp:r===c});
   return { cols, rest: deck.slice(i) };
 };
-
-const canStack = (card, onto) => {
-  if (!onto) return card.num === 13;
-  return onto.faceUp && onto.red !== card.red && onto.num === card.num + 1;
-};
-const canFoundation = (card, pile) => {
-  if (!pile.length) return card.num === 1;
-  const t = pile[pile.length-1];
-  return t.suit === card.suit && card.num === t.num + 1;
-};
+const canStack      = (c,on) => !on ? c.num===13 : on.faceUp && on.red!==c.red && on.num===c.num+1;
+const canFoundation = (c,p)  => !p.length ? c.num===1 : p[p.length-1].suit===c.suit && c.num===p[p.length-1].num+1;
 
 // ── state ──────────────────────────────────────────────
-let G; // game state
+let G;
 
 function initState() {
-  const d1 = mkDeck(), d2 = mkDeck();
-  const b1 = deal(d1),  b2 = deal(d2);
+  const d1=mkDeck(), d2=mkDeck();
+  const b1=deal(d1), b2=deal(d2);
   return {
     boards: [
-      { cols: b1.cols, foundations: [[],[],[],[]] },
-      { cols: b2.cols, foundations: [[],[],[],[]] },
+      { cols:b1.cols, foundations:[[],[],[],[]], waste:[] },  // NON
+      { cols:b2.cols, foundations:[[],[],[],[]], waste:[] },  // OUI
     ],
-    stock: shuffle([...b1.rest, ...b2.rest]),
-    waste: [],
-    selected: null,  // { src:'waste' } | { bi, ci, idx }
+    stock: shuffle([...b1.rest, ...b2.rest]),  // single shared stock
+    selected: null,   // null | {src:'waste',bi} | {bi,ci,idx}
     moves: 0,
   };
 }
@@ -428,235 +332,231 @@ function newGame() {
   render();
 }
 
-// ── actions ────────────────────────────────────────────
+// ── OPTION C: draw 2 cards, one to each board's waste ──────────
 function drawCards() {
   if (!G.stock.length) {
-    G.stock = G.waste.reverse().map(c => ({...c, faceUp:false}));
-    G.waste = [];
-  } else {
-    const n = Math.min(3, G.stock.length);
-    const drawn = G.stock.splice(0, n).map(c => ({...c, faceUp:true}));
-    G.waste.push(...drawn);
+    // Recycle: interleave both wastes (reversed) back into a reshuffled stock
+    const w0 = [...G.boards[0].waste].reverse();
+    const w1 = [...G.boards[1].waste].reverse();
+    const combined = [];
+    const maxLen = Math.max(w0.length, w1.length);
+    for (let i=0;i<maxLen;i++) {
+      if (i<w0.length) combined.push({...w0[i], faceUp:false});
+      if (i<w1.length) combined.push({...w1[i], faceUp:false});
+    }
+    G.stock = shuffle(combined);
+    G.boards[0].waste = [];
+    G.boards[1].waste = [];
     G.selected = null;
-  }
-  render();
-}
-
-function wasteTop() { return G.waste.length ? G.waste[G.waste.length-1] : null; }
-function consumeWaste() { G.waste.pop(); }
-
-function clickCard(bi, ci, idx) {
-  const col = G.boards[bi].cols[ci];
-  const card = col[idx];
-  const w = wasteTop();
-
-  if (!card.faceUp) {
-    if (idx === col.length - 1) { col[idx].faceUp = true; G.moves++; }
     render(); return;
   }
 
-  // waste active: try to place on col
-  if (w && !G.selected) {
-    const top = col.length ? col[col.length-1] : null;
-    if (idx === col.length-1 && canStack(w, top)) {
-      col.push(w); consumeWaste(); G.moves++;
+  // First card → NON (board 0), second card → OUI (board 1)
+  const c1 = G.stock.length >= 1 ? {...G.stock.shift(), faceUp:true} : null;
+  const c2 = G.stock.length >= 1 ? {...G.stock.shift(), faceUp:true} : null;
+  if (c1) G.boards[0].waste.push(c1);
+  if (c2) G.boards[1].waste.push(c2);
+  G.selected = null;
+  render();
+}
+
+const wasteTop    = bi => { const w=G.boards[bi].waste; return w.length ? w[w.length-1] : null; };
+const consumeWaste= bi => G.boards[bi].waste.pop();
+
+// ── click: waste card of a board ───────────────────────
+function clickWaste(bi) {
+  const w = wasteTop(bi);
+  if (!w) return;
+  const sel = G.selected;
+  if (sel?.src==='waste' && sel.bi===bi) G.selected = null;
+  else G.selected = {src:'waste', bi};
+  render();
+}
+
+// ── click: a tableau card ──────────────────────────────
+function clickCard(bi, ci, idx) {
+  const col  = G.boards[bi].cols[ci];
+  const card = col[idx];
+  const sel  = G.selected;
+
+  // Flip face-down top card
+  if (!card.faceUp) {
+    if (idx===col.length-1) { col[idx].faceUp=true; G.moves++; }
+    render(); return;
+  }
+
+  // No selection active: try placing this board's waste top on the clicked card
+  if (!sel) {
+    const w = wasteTop(bi);
+    if (w && idx===col.length-1 && canStack(w, card)) {
+      col.push(w); consumeWaste(bi); G.moves++;
+    } else {
+      G.selected = {bi, ci, idx};
     }
     render(); return;
   }
 
-  const sel = G.selected;
-  if (!sel) { G.selected = {bi, ci, idx}; render(); return; }
-  if (sel.src !== 'waste' && sel.bi === bi && sel.ci === ci && sel.idx === idx) {
+  // Deselect same card
+  if (sel.src!=='waste' && sel.bi===bi && sel.ci===ci && sel.idx===idx) {
     G.selected = null; render(); return;
   }
-  // cross-board: reselect
-  if (sel.bi !== undefined && sel.bi !== bi) {
-    G.selected = {bi, ci, idx}; render(); return;
+
+  // Resolve the moving card(s)
+  let srcCard, moving, fromWaste=false;
+  if (sel.src==='waste') {
+    const wSrc = wasteTop(sel.bi);
+    if (!wSrc) { G.selected=null; render(); return; }
+    srcCard=wSrc; fromWaste=true; moving=[wSrc];
+  } else {
+    // Cross-board col→col: not allowed
+    if (sel.bi !== bi) { G.selected={bi,ci,idx}; render(); return; }
+    const fromCol = G.boards[sel.bi].cols[sel.ci];
+    srcCard = fromCol[sel.idx];
+    moving  = fromCol.slice(sel.idx);
   }
 
-  // try to stack
-  if (idx === col.length-1 && canStack(sel.src === 'waste' ? w : G.boards[sel.bi].cols[sel.ci][sel.idx], card)) {
-    if (sel.src === 'waste') {
-      col.push(w); consumeWaste();
+  if (idx===col.length-1 && canStack(srcCard, card)) {
+    col.push(...moving);
+    if (fromWaste) {
+      consumeWaste(sel.bi);
     } else {
       const fromCol = G.boards[sel.bi].cols[sel.ci];
-      const moving = fromCol.splice(sel.idx);
-      if (fromCol.length) fromCol[fromCol.length-1].faceUp = true;
-      col.push(...moving);
+      fromCol.splice(sel.idx);
+      if (fromCol.length) fromCol[fromCol.length-1].faceUp=true;
     }
-    G.moves++; G.selected = null;
+    G.moves++; G.selected=null;
   } else {
-    G.selected = {bi, ci, idx};
+    // Reselect clicked card only if it's a face-up top card on same board
+    if (card.faceUp) G.selected={bi,ci,idx};
+    else G.selected=null;
   }
   render();
 }
 
+// ── click: empty column ────────────────────────────────
 function clickEmptyCol(bi, ci) {
-  const w = wasteTop();
   const sel = G.selected;
-  if (w && !sel) {
-    if (w.num === 13) { G.boards[bi].cols[ci].push(w); consumeWaste(); G.moves++; }
-    render(); return;
+
+  let srcCard, moving, fromWaste=false, wasteBi=-1;
+
+  if (!sel) {
+    // No selection: try this board's own waste top
+    const w = wasteTop(bi);
+    if (w && w.num===13) { srcCard=w; fromWaste=true; wasteBi=bi; }
+    else return;
+  } else if (sel.src==='waste') {
+    const wSrc = wasteTop(sel.bi);
+    if (!wSrc || wSrc.num!==13) return;
+    srcCard=wSrc; fromWaste=true; wasteBi=sel.bi;
+  } else {
+    if (sel.bi!==bi) return; // no cross-board
+    const fromCol = G.boards[sel.bi].cols[sel.ci];
+    srcCard = fromCol[sel.idx];
+    if (srcCard.num!==13) return;
+    moving = fromCol.slice(sel.idx);
   }
-  if (!sel) return;
-  const srcCard = sel.src === 'waste' ? w : (G.boards[sel.bi]?.cols[sel.ci]?.[sel.idx]);
-  if (!srcCard || srcCard.num !== 13) return;
-  if (sel.bi !== undefined && sel.bi !== bi) return; // no cross-board
-  if (sel.src === 'waste') {
-    G.boards[bi].cols[ci].push(w); consumeWaste();
+
+  if (fromWaste) {
+    G.boards[bi].cols[ci].push({...srcCard});
+    consumeWaste(wasteBi);
   } else {
     const fromCol = G.boards[sel.bi].cols[sel.ci];
-    const moving = fromCol.splice(sel.idx);
-    if (fromCol.length) fromCol[fromCol.length-1].faceUp = true;
-    G.boards[bi].cols[ci].push(...moving);
+    const mv = fromCol.splice(sel.idx);
+    if (fromCol.length) fromCol[fromCol.length-1].faceUp=true;
+    G.boards[bi].cols[ci].push(...mv);
   }
-  G.moves++; G.selected = null;
+  G.moves++; G.selected=null;
   render();
 }
 
+// ── click: foundation pile ─────────────────────────────
 function clickFoundation(bi, fi) {
   const pile = G.boards[bi].foundations[fi];
   const suit = SUITS[fi];
-  const w = wasteTop();
-  const sel = G.selected;
+  const sel  = G.selected;
 
-  let card, fromWaste = false;
-  if (w && !sel) {
-    if (w.suit !== suit || !canFoundation(w, pile)) return;
-    card = w; fromWaste = true;
-  } else if (sel) {
-    if (sel.bi !== undefined && sel.bi !== bi) return;
-    if (sel.src === 'waste') {
-      if (!w || w.suit !== suit || !canFoundation(w, pile)) return;
-      card = w; fromWaste = true;
-    } else {
-      const fromCol = G.boards[sel.bi].cols[sel.ci];
-      if (sel.idx !== fromCol.length-1) return;
-      card = fromCol[sel.idx];
-      if (card.suit !== suit || !canFoundation(card, pile)) return;
-      fromCol.splice(sel.idx, 1);
-      if (fromCol.length) fromCol[fromCol.length-1].faceUp = true;
-    }
-  } else return;
+  let card, fromWaste=false, wasteBi=-1;
 
-  if (fromWaste) consumeWaste();
+  if (!sel) {
+    const w = wasteTop(bi);
+    if (!w || w.suit!==suit || !canFoundation(w,pile)) return;
+    card=w; fromWaste=true; wasteBi=bi;
+  } else if (sel.src==='waste') {
+    const wSrc = wasteTop(sel.bi);
+    if (!wSrc || wSrc.suit!==suit || !canFoundation(wSrc,pile)) return;
+    card=wSrc; fromWaste=true; wasteBi=sel.bi;
+  } else {
+    if (sel.bi!==bi) return; // no cross-board to foundation
+    const fromCol = G.boards[sel.bi].cols[sel.ci];
+    if (sel.idx!==fromCol.length-1) return;
+    card = fromCol[sel.idx];
+    if (card.suit!==suit || !canFoundation(card,pile)) return;
+    fromCol.splice(sel.idx,1);
+    if (fromCol.length) fromCol[fromCol.length-1].faceUp=true;
+  }
+
+  if (fromWaste) consumeWaste(wasteBi);
   pile.push(card);
-  G.moves++;
-  G.selected = null;
-  checkWin();
-  render();
-}
-
-function clickWaste() {
-  const w = wasteTop();
-  if (!w) return;
-  if (G.selected?.src === 'waste') G.selected = null;
-  else G.selected = { src: 'waste' };
-  render();
+  G.moves++; G.selected=null;
+  checkWin(); render();
 }
 
 function checkWin() {
-  const s = G.boards.map(b => b.foundations.reduce((a,f) => a+f.length, 0));
-  if (s[0] === 52 && s[1] === 52) {
+  const s = G.boards.map(b=>b.foundations.reduce((a,f)=>a+f.length,0));
+  if (s[0]===52 && s[1]===52) {
     document.getElementById('win-overlay').classList.add('show');
     document.getElementById('win-moves').textContent = `${G.moves} mouvements`;
   }
 }
 
 // ── render ─────────────────────────────────────────────
-const SUIT_LABELS = ['♥','♦','♠','♣'];
-
-function renderCard(card, extra = {}) {
-  const { selected = false, stackSelected = false, onClick } = extra;
+function renderCard(card, {selected=false, stackSelected=false, onClick=null, inline=false}={}) {
   const el = document.createElement('div');
-  el.className = 'card ' + (card.faceUp
-    ? `face-up ${card.red?'red':'black'}${selected?' selected':''}${stackSelected?' selected-stack':''}`
-    : 'face-down');
+  el.className = [
+    'card',
+    inline ? 'inline' : '',
+    card.faceUp
+      ? `face-up ${card.red?'red':'black'}${selected?' selected':''}${stackSelected?' selected-stack':''}`
+      : 'face-down'
+  ].join(' ');
   if (onClick) el.addEventListener('click', e => { e.stopPropagation(); onClick(); });
   if (card.faceUp) {
-    const top = document.createElement('div');
-    top.className = 'card-top';
-    top.textContent = `${card.val}${card.suit}`;
-    const mid = document.createElement('div');
-    mid.className = 'card-center';
-    mid.textContent = card.suit;
-    const bot = document.createElement('div');
-    bot.className = 'card-bot';
-    bot.textContent = `${card.val}${card.suit}`;
-    el.append(top, mid, bot);
+    const t=document.createElement('div'); t.textContent=`${card.val}${card.suit}`;
+    const m=document.createElement('div'); m.className='card-center'; m.textContent=card.suit;
+    const b=document.createElement('div'); b.className='card-bot'; b.textContent=`${card.val}${card.suit}`;
+    el.append(t,m,b);
   }
   return el;
 }
 
 function render() {
-  const sel = G.selected;
-  const scores = G.boards.map(b => b.foundations.reduce((a,f) => a+f.length, 0));
-  const total  = scores[0] + scores[1];
-  const diff   = Math.abs(scores[0] - scores[1]);
-  const pct    = total > 0 ? scores[0]/total : 0.5;
+  const sel    = G.selected;
+  const scores = G.boards.map(b=>b.foundations.reduce((a,f)=>a+f.length,0));
+  const total  = scores[0]+scores[1];
+  const pct    = total>0 ? scores[0]/total : 0.5;
+  const diff   = Math.abs(scores[0]-scores[1]);
 
   // bar
   document.getElementById('score-a').textContent = scores[0];
   document.getElementById('score-b').textContent = scores[1];
   document.getElementById('bar-fill').style.width = `${pct*100}%`;
   const lbl = document.getElementById('bar-label');
-  if (diff === 0 && total > 0) { lbl.textContent = '⚖ Équilibre parfait'; lbl.className = 'bar-label eq'; }
-  else if (diff > 0) { lbl.textContent = `écart : ${diff}`; lbl.className = 'bar-label'; }
-  else { lbl.textContent = ''; }
+  if (diff===0&&total>0) { lbl.textContent='⚖ Équilibre parfait'; lbl.className='bar-label eq'; }
+  else if (diff>0)       { lbl.textContent=`écart : ${diff}`;      lbl.className='bar-label'; }
+  else                   { lbl.textContent=''; }
 
   // stock
-  const stockEl = document.getElementById('stock-btn');
-  const stockCount = G.stock.length;
-  const stockIcon  = document.getElementById('stock-icon');
-  if (stockCount > 0) {
-    stockEl.className = 'stock-card has-cards';
-    stockIcon.textContent = '';
-    stockIcon.style.color = '';
+  const stockEl  = document.getElementById('stock-btn');
+  const stockIcon= document.getElementById('stock-icon');
+  const n = G.stock.length;
+  if (n>0) {
+    stockEl.className='stock-btn has-cards';
+    stockIcon.textContent=''; stockIcon.style.color='';
   } else {
-    stockEl.className = 'stock-card empty';
-    stockIcon.textContent = '↺';
-    stockIcon.style.color = 'var(--muted)';
+    stockEl.className='stock-btn empty';
+    stockIcon.textContent='↺'; stockIcon.style.color='var(--muted)';
   }
-  document.getElementById('stock-count').textContent = stockCount;
-
-  // waste
-  const wasteFan = document.getElementById('waste-fan');
-  wasteFan.innerHTML = '';
-  const w = wasteTop();
-  const wasteLbl = document.getElementById('waste-label');
-  if (G.waste.length) {
-    wasteLbl.textContent = 'À PLACER';
-    wasteLbl.className = 'draw-label active';
-    const slice = G.waste.slice(-3);
-    const fanW = 48 + (slice.length - 1) * 18;
-    wasteFan.style.width = fanW + 'px';
-    slice.forEach((card, i) => {
-      const isTop = i === slice.length - 1;
-      const el = renderCard(card, {
-        selected: isTop && sel?.src === 'waste',
-        onClick: isTop ? clickWaste : null,
-      });
-      el.style.position = 'absolute';
-      el.style.left = (i * 18) + 'px';
-      el.style.top  = '0';
-      el.style.zIndex = i;
-      if (!isTop) el.style.opacity = '0.65';
-      wasteFan.appendChild(el);
-    });
-  } else {
-    wasteLbl.textContent = '—';
-    wasteLbl.className = 'draw-label';
-    wasteFan.style.width = '48px';
-    const empty = document.createElement('div');
-    Object.assign(empty.style, {
-      width:'48px', height:'68px',
-      border:'1.5px dashed var(--border)',
-      borderRadius:'5px',
-      background:'transparent',
-    });
-    wasteFan.appendChild(empty);
-  }
-
+  document.getElementById('stock-count').textContent = n ? n+' carte'+(n>1?'s':'') : 'Cliquer pour recycler';
   document.getElementById('moves-count').textContent = `${G.moves} mvt`;
 
   // boards
@@ -664,86 +564,98 @@ function render() {
   boardsEl.innerHTML = '';
 
   G.boards.forEach((board, bi) => {
-    const hasSelection = sel && (sel.src === 'waste' || sel.bi === bi);
-    const boardScore = scores[bi];
-    const letter = bi === 0 ? 'NON' : 'OUI';
-    const cls    = bi === 0 ? 'a' : 'b';
+    const bScore = scores[bi];
+    const label  = bi===0 ? 'NON' : 'OUI';
+    const cls    = bi===0 ? 'a' : 'b';
+    const w      = wasteTop(bi);
+    const wasteSelected = sel?.src==='waste' && sel.bi===bi;
+    // Dim only when selection is from the OTHER board's columns
+    const dim = sel && sel.src!=='waste' && sel.bi!==undefined && sel.bi!==bi;
 
     const div = document.createElement('div');
-    div.className = `board ${cls}${sel && !hasSelection ? ' dim' : ''}`;
+    div.className = `board ${cls}${dim?' dim':''}`;
 
     // header
-    const hdr = document.createElement('div');
-    hdr.className = 'board-header';
-    hdr.innerHTML = `<span class="board-name">${letter}</span><span class="board-count">${boardScore} / 52</span>`;
+    const hdr=document.createElement('div'); hdr.className='board-header';
+    hdr.innerHTML=`<span class="board-name">${label}</span><span class="board-count">${bScore} / 52</span>`;
     div.appendChild(hdr);
 
+    // top row: [foundations] [waste]
+    const topRow=document.createElement('div'); topRow.className='top-row';
+
     // foundations
-    const fRow = document.createElement('div');
-    fRow.className = 'foundations';
-    SUITS.forEach((suit, fi) => {
-      const pile = board.foundations[fi];
-      const slotEl = document.createElement('div');
+    const fRow=document.createElement('div'); fRow.className='foundations';
+    SUITS.forEach((suit,fi)=>{
+      const pile=board.foundations[fi];
       if (pile.length) {
-        const topCard = pile[pile.length-1];
-        const cardEl = renderCard(topCard, { onClick: () => clickFoundation(bi, fi) });
-        cardEl.style.position = 'relative';
-        cardEl.style.width = 'var(--cw)';
-        cardEl.style.height = 'var(--ch)';
-        slotEl.appendChild(cardEl);
+        const cardEl=renderCard(pile[pile.length-1],{inline:true,onClick:()=>clickFoundation(bi,fi)});
+        fRow.appendChild(cardEl);
       } else {
-        slotEl.className = 'slot-empty';
-        slotEl.textContent = suit;
-        slotEl.addEventListener('click', () => clickFoundation(bi, fi));
+        const slot=document.createElement('div');
+        slot.className='slot-empty';
+        slot.textContent=suit;
+        slot.addEventListener('click',()=>clickFoundation(bi,fi));
+        fRow.appendChild(slot);
       }
-      slotEl.style.flexShrink = '0';
-      fRow.appendChild(slotEl);
     });
-    div.appendChild(fRow);
+    topRow.appendChild(fRow);
+
+    // waste area (per-board)
+    const wasteArea=document.createElement('div'); wasteArea.className='waste-area';
+
+    const wLbl=document.createElement('div');
+    wLbl.className='waste-lbl'+(w?' active':'');
+    wLbl.textContent = w ? 'À PLACER' : '—';
+    wasteArea.appendChild(wLbl);
+
+    if (w) {
+      const cardEl=renderCard(w,{inline:true,selected:wasteSelected,onClick:()=>clickWaste(bi)});
+      wasteArea.appendChild(cardEl);
+    } else {
+      const slot=document.createElement('div');
+      slot.className='slot-empty';
+      slot.style.opacity='.35';
+      wasteArea.appendChild(slot);
+    }
+
+    const depth=document.createElement('div'); depth.className='waste-depth';
+    depth.textContent = board.waste.length>1 ? `+${board.waste.length-1}` : '';
+    wasteArea.appendChild(depth);
+
+    topRow.appendChild(wasteArea);
+    div.appendChild(topRow);
 
     // columns
-    const colRow = document.createElement('div');
-    colRow.className = 'columns';
-
-    board.cols.forEach((col, ci) => {
-      const wrap = document.createElement('div');
-      wrap.className = 'col-wrap';
+    const colRow=document.createElement('div'); colRow.className='columns';
+    board.cols.forEach((col,ci)=>{
+      const wrap=document.createElement('div'); wrap.className='col-wrap';
 
       if (!col.length) {
-        const empty = document.createElement('div');
-        empty.className = 'slot-empty';
-        empty.style.position = 'relative';
-        empty.addEventListener('click', () => clickEmptyCol(bi, ci));
-        wrap.style.height = 'var(--ch)';
-        wrap.appendChild(empty);
-        colRow.appendChild(wrap);
-        return;
+        const slot=document.createElement('div');
+        slot.className='slot-empty';
+        slot.style.position='relative';
+        slot.addEventListener('click',()=>clickEmptyCol(bi,ci));
+        wrap.style.height='var(--ch)';
+        wrap.appendChild(slot);
+        colRow.appendChild(wrap); return;
       }
 
-      // compute height
-      let totalH = 0;
-      col.forEach((card, i) => {
-        totalH += i < col.length-1 ? (card.faceUp ? 32 : 17) : 68;
-      });
-      wrap.style.height = Math.max(totalH, 68) + 'px';
+      let h=0;
+      col.forEach((c,i)=>{ h += i<col.length-1 ? (c.faceUp?32:17) : 68; });
+      wrap.style.height=Math.max(h,68)+'px';
 
-      let offsetY = 0;
-      col.forEach((card, i) => {
-        const isTop = i === col.length - 1;
-        const isSelected = sel && sel.bi === bi && sel.ci === ci && sel.idx !== undefined && i === sel.idx && sel.src !== 'waste';
-        const isStackSel = sel && sel.bi === bi && sel.ci === ci && sel.idx !== undefined && i > sel.idx && sel.src !== 'waste';
-
-        const cardEl = renderCard(card, {
-          selected: isSelected,
-          stackSelected: isStackSel,
-          onClick: () => clickCard(bi, ci, i),
+      let offsetY=0;
+      col.forEach((card,i)=>{
+        const isSel      = sel && sel.src!=='waste' && sel.bi===bi && sel.ci===ci && sel.idx===i;
+        const isStackSel = sel && sel.src!=='waste' && sel.bi===bi && sel.ci===ci && sel.idx!==undefined && i>sel.idx;
+        const cardEl=renderCard(card,{
+          selected:isSel, stackSelected:isStackSel,
+          onClick:()=>clickCard(bi,ci,i),
         });
-        cardEl.style.top = offsetY + 'px';
-
+        cardEl.style.top=offsetY+'px';
         wrap.appendChild(cardEl);
-        if (!isTop) offsetY += card.faceUp ? 32 : 17;
+        if (i<col.length-1) offsetY+=card.faceUp?32:17;
       });
-
       colRow.appendChild(wrap);
     });
 
@@ -752,7 +664,6 @@ function render() {
   });
 }
 
-// ── boot ───────────────────────────────────────────────
 newGame();
 </script>
 </body>
