@@ -194,7 +194,7 @@
     line-height: 1.15;
   }
   .card.face-up.red { color: var(--red); }
-  .card.face-up.black { color: #1a1a1a; }
+  .card.face-up.black { color: #1a3d7c; }
   .card.face-up.selected {
     background: #fffbef;
     border-color: var(--gold);
@@ -316,7 +316,7 @@
 <body>
 
 <h1>Deux Solitudes</h1>
-<p class="subtitle">double solitaire</p>
+<p class="subtitle">A Quebec Referendum Solitaire Game</p>
 
 <div class="bar-row">
   <span class="bar-score a" id="score-a">0</span>
@@ -666,7 +666,7 @@ function render() {
   G.boards.forEach((board, bi) => {
     const hasSelection = sel && (sel.src === 'waste' || sel.bi === bi);
     const boardScore = scores[bi];
-    const letter = bi === 0 ? 'A' : 'B';
+    const letter = bi === 0 ? 'NON' : 'OUI';
     const cls    = bi === 0 ? 'a' : 'b';
 
     const div = document.createElement('div');
@@ -675,7 +675,7 @@ function render() {
     // header
     const hdr = document.createElement('div');
     hdr.className = 'board-header';
-    hdr.innerHTML = `<span class="board-name">Plateau ${letter}</span><span class="board-count">${boardScore} / 52</span>`;
+    hdr.innerHTML = `<span class="board-name">${letter}</span><span class="board-count">${boardScore} / 52</span>`;
     div.appendChild(hdr);
 
     // foundations
