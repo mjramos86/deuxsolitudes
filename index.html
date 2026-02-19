@@ -27,7 +27,7 @@ body{
 h1{font-family:'Cormorant Garamond',serif;font-size:clamp(15px,2.2vw,21px);
    font-weight:400;letter-spacing:.35em;color:var(--gold);text-transform:uppercase;
    text-shadow:0 0 40px rgba(200,168,75,.3)}
-.subtitle{font-size:8px;color:var(--muted);letter-spacing:.2em}
+.subtitle{font-size:13px;color:var(--gold);letter-spacing:.22em;opacity:.7;margin-top:2px;font-family:'Cormorant Garamond',serif;font-style:italic}
 .timer{font-size:20px;font-weight:700;color:var(--gold);letter-spacing:.05em;
        font-variant-numeric:tabular-nums;min-width:72px;text-align:right}
 
@@ -110,12 +110,18 @@ h1{font-family:'Cormorant Garamond',serif;font-size:clamp(15px,2.2vw,21px);
       transition:box-shadow .1s,opacity .15s}
 .card.inline{position:relative;display:flex;flex-shrink:0}
 .card.dragging-source{opacity:.25;pointer-events:none}
-.card.face-down{
-  background:repeating-linear-gradient(135deg,#0d2518 0,#0d2518 7px,#0a1c13 7px,#0a1c13 14px);
-  border:1.5px solid rgba(200,168,75,.18);cursor:default
+.card.face-down{border:1.5px solid rgba(200,168,75,.18);cursor:default}
+.card.face-down::after{content:'';position:absolute;inset:3px;border-radius:3px}
+/* NON = red back */
+.card.face-down.back-non{
+  background:repeating-linear-gradient(135deg,#3d0a0a 0,#3d0a0a 7px,#5c1212 7px,#5c1212 14px);
 }
-.card.face-down::after{content:'';position:absolute;inset:3px;
-  border:1px solid rgba(200,168,75,.1);border-radius:3px}
+.card.face-down.back-non::after{border:1px solid rgba(220,80,80,.22)}
+/* OUI = blue back */
+.card.face-down.back-oui{
+  background:repeating-linear-gradient(135deg,#0a1a3d 0,#0a1a3d 7px,#12285c 7px,#12285c 14px);
+}
+.card.face-down.back-oui::after{border:1px solid rgba(91,155,213,.22)}
 .card.face-up{
   background:var(--card-bg);border:1.5px solid #c8b99a;
   box-shadow:0 2px 6px var(--card-sh);display:flex;flex-direction:column;
@@ -345,8 +351,8 @@ function initState(){
   const b0=deal(d0),b1=deal(d1);
   return {
     boards:[
-      {cols:b0.cols,stock:b0.rest,hand:null},   // NON  bi=0
-      {cols:b1.cols,stock:b1.rest,hand:null},   // OUI  bi=1
+      {cols:b0.cols,stock:b0.rest,waste:[]},   // NON  bi=0
+      {cols:b1.cols,stock:b1.rest,waste:[]},   // OUI  bi=1
     ],
     foundation:[[],[],[],[]],   // shared, by SUIT_IDX
     trash:[],                   // shared dump
@@ -397,7 +403,7 @@ function assertNoDuplicates(){
   };
   G.boards.forEach((bd,bi)=>{
     bd.cols.forEach((col,ci)=>col.forEach((c,i)=>chk(c,`b${bi}c${ci}[${i}]`)));
-    if(bd.hand) chk(bd.hand,`b${bi}.hand`);
+    bd.waste.forEach((c,i)=>chk(c,`b${bi}wst[${i}]`));
     bd.stock.forEach((c,i)=>chk(c,`b${bi}stk[${i}]`));
   });
   G.foundation.forEach((p,fi)=>p.forEach((c,i)=>chk(c,`fnd${fi}[${i}]`)));
@@ -411,11 +417,11 @@ function assertNoDuplicates(){
 
 function drawCard(bi){
   const bd=G.boards[bi];
-  if(bd.hand!==null) return;   // must play/trash current hand first
   if(!bd.stock.length) return;
   const card=bd.stock.shift();
   card.faceUp=true;
-  bd.hand=card;
+  bd.waste.push(card);
+  // Auto-select top of waste
   G.selected={src:'hand',bi};
   render();
 }
@@ -428,9 +434,9 @@ function resolveMove(src,dst){
   let cards,fromHand=false;
 
   if(src.src==='hand'){
-    const c=G.boards[src.bi].hand;
-    if(!c) return false;
-    cards=[c]; fromHand=true;
+    const w=G.boards[src.bi].waste;
+    if(!w.length) return false;
+    cards=[w[w.length-1]]; fromHand=true;
   } else {
     const col=G.boards[src.bi].cols[src.ci];
     cards=col.slice(src.idx);
@@ -472,7 +478,7 @@ function resolveMove(src,dst){
 
 function commitSrc(src,fromHand){
   if(fromHand){
-    G.boards[src.bi].hand=null;
+    G.boards[src.bi].waste.pop();
   } else {
     const fc=G.boards[src.bi].cols[src.ci];
     fc.splice(src.idx);
@@ -484,8 +490,8 @@ function commitSrc(src,fromHand){
 function hasAnyMove(){
   for(let bi=0;bi<2;bi++){
     const bd=G.boards[bi];
-    if(bd.stock.length>0&&!bd.hand) return true;   // can draw
-    if(bd.hand) return true;                        // has hand (can always trash)
+    if(bd.stock.length>0) return true;       // can always draw
+    if(bd.waste.length>0) return true;       // has waste (can always trash)
     if(hasTableauMove(bi)) return true;
   }
   return false;
@@ -546,7 +552,8 @@ function clickStock(bi){
 
 function clickHand(bi){
   if(suppressClick) return;
-  if(!G.boards[bi].hand) return;
+  const w=G.boards[bi].waste;
+  if(!w.length) return;
   const sel=G.selected;
   if(sel?.src==='hand'&&sel.bi===bi) G.selected=null;
   else G.selected={src:'hand',bi};
@@ -586,7 +593,7 @@ function clickFoundation(fi){
   if(!sel){
     // Try either board's hand
     for(let bi=0;bi<2;bi++){
-      if(G.boards[bi].hand){
+      if(G.boards[bi].waste.length){
         if(resolveMove({src:'hand',bi},{type:'fnd',fi})){render();return;}
       }
     }
@@ -764,12 +771,13 @@ function unmarkSrc(){if(DRAG)DRAG.sourceEls.forEach(e=>e.classList.remove('dragg
 // ═══════════════════════════════════════════════════════
 //  RENDER
 // ═══════════════════════════════════════════════════════
-function mkCardEl(card,sel,stk){
+function mkCardEl(card,sel,stk,bi){
+  const backCls=bi===0?'back-non':bi===1?'back-oui':'';
   const el=document.createElement('div');
   el.className=['card',
     card.faceUp
       ?`face-up ${card.red?'red':'black'}${sel?' selected':''}${stk?' sel-stack':''}`
-      :'face-down'
+      :`face-down ${backCls}`
   ].join(' ');
   if(card.faceUp){
     const t=document.createElement('div'); t.textContent=`${card.val}${card.suit}`;
@@ -826,7 +834,7 @@ function render(){
 
   // Boards
   G.boards.forEach((bd,bi)=>{
-    const stuck=!bd.stock.length&&!bd.hand&&!hasTableauMove(bi);
+    const stuck=!bd.stock.length&&!bd.waste.length&&!hasTableauMove(bi);
     document.getElementById(`bd-${bi}`).classList.toggle('stuck',stuck);
     document.getElementById(`bm-${bi}`).textContent=`${sc[bi]} / 52`;
 
@@ -843,24 +851,29 @@ function render(){
     sc2.textContent=bd.stock.length?bd.stock.length+' carte'+(bd.stock.length>1?'s':''):'Vide';
     sg.append(sl,sb,sc2); btEl.appendChild(sg);
 
-    // Hand group
+    // Waste pile group (draw into here, play top card)
     const hg=document.createElement('div'); hg.className='col-grp';
+    const wasteTop=bd.waste.length?bd.waste[bd.waste.length-1]:null;
     const hl=document.createElement('div');
-    hl.className='col-lbl'+(bd.hand?' active':''); hl.textContent=bd.hand?'EN MAIN':'—';
+    hl.className='col-lbl'+(wasteTop?' active':''); hl.textContent=wasteTop?'EN MAIN':'—';
     hg.appendChild(hl);
 
-    if(bd.hand){
+    if(wasteTop){
       const handSel=sel?.src==='hand'&&sel.bi===bi;
-      const el=mkCardEl(bd.hand,handSel,false); el.classList.add('inline');
+      const el=mkCardEl(wasteTop,handSel,false,bi); el.classList.add('inline');
       const hsrc={src:'hand',bi};
       el.addEventListener('click',()=>clickHand(bi));
-      attachDrag(el,hsrc,()=>[bd.hand]);
+      attachDrag(el,hsrc,()=>[wasteTop]);
       const k=srcKey(hsrc); DSM.set(k,[el]);
       hg.appendChild(el);
     } else {
       const s=document.createElement('div'); s.className='slot'; s.style.opacity='.28';
       hg.appendChild(s);
     }
+    // Show waste depth indicator
+    const wdepth=document.createElement('div'); wdepth.className='col-cnt';
+    wdepth.textContent=bd.waste.length>1?`+${bd.waste.length-1}`:' ';
+    hg.appendChild(wdepth);
     btEl.appendChild(hg);
 
     // Columns
@@ -881,7 +894,7 @@ function render(){
         const isTop=i===col.length-1;
         const isSel=sel&&sel.src!=='hand'&&sel.bi===bi&&sel.ci===ci&&sel.idx===i;
         const isStk=sel&&sel.src!=='hand'&&sel.bi===bi&&sel.ci===ci&&sel.idx!=null&&i>sel.idx;
-        const el=mkCardEl(card,isSel,isStk); el.style.top=y+'px';
+        const el=mkCardEl(card,isSel,isStk,bi); el.style.top=y+'px';
         if(isTop&&card.faceUp){el.dataset.drop='col';el.dataset.bi=bi;el.dataset.ci=ci;}
         el.addEventListener('click',()=>clickCard(bi,ci,i));
         if(card.faceUp){
