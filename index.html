@@ -150,6 +150,23 @@ h1{font-family:'Cormorant Garamond',serif;font-size:clamp(15px,2.2vw,21px);
          box-shadow:0 0 0 2px rgba(200,168,75,.3)!important}
 .card.drop-card{box-shadow:0 0 0 2px var(--gold),0 2px 8px var(--card-sh)!important;
                 background:#fffef5!important}
+/* Blocked card X overlay */
+.card.blocked::before{
+  content:'✕';
+  position:absolute;inset:0;
+  display:flex;align-items:center;justify-content:center;
+  font-size:22px;font-weight:900;
+  color:rgba(220,50,50,.85);
+  font-family:'Courier Prime',monospace;
+  pointer-events:none;z-index:2;
+  background:rgba(60,0,0,.12);
+  border-radius:4px;
+}
+/* Stock reshuffle state */
+.stock-btn.reshuffle{
+  background:repeating-linear-gradient(135deg,#1a2d20 0,#1a2d20 8px,#0f1f15 8px,#0f1f15 16px);
+  border-color:rgba(200,168,75,.2);color:var(--muted);cursor:pointer;
+}
 
 /* ── Drag ghost ── */
 #ghost{position:fixed;pointer-events:none;z-index:9999;display:none;
@@ -351,8 +368,8 @@ function initState(){
   const b0=deal(d0),b1=deal(d1);
   return {
     boards:[
-      {cols:b0.cols,stock:b0.rest,waste:[]},   // NON  bi=0
-      {cols:b1.cols,stock:b1.rest,waste:[]},   // OUI  bi=1
+      {cols:b0.cols,stock:b0.rest,waste:[],blocked:new Set()},   // NON  bi=0
+      {cols:b1.cols,stock:b1.rest,waste:[],blocked:new Set()},   // OUI  bi=1
     ],
     foundation:[[],[],[],[]],   // shared, by SUIT_IDX
     trash:[],                   // shared dump
@@ -417,13 +434,28 @@ function assertNoDuplicates(){
 
 function drawCard(bi){
   const bd=G.boards[bi];
-  if(!bd.stock.length) return;
+  // Reshuffle waste → stock when stock empty
+  if(!bd.stock.length){
+    if(!bd.waste.length) return;
+    // Flip waste back face-down and reshuffle into stock
+    bd.waste.forEach(c=>c.faceUp=false);
+    bd.stock=shuffle(bd.waste);
+    bd.waste=[];
+  }
   const card=bd.stock.shift();
   card.faceUp=true;
   bd.waste.push(card);
-  // Auto-select top of waste
   G.selected={src:'hand',bi};
   render();
+}
+
+// ─── Blocked card helpers ───────────────────────────
+const blockKey = c => `${c.suit}${c.num}`;
+const isBlocked = (card,bi) => G.boards[bi].blocked.has(blockKey(card));
+
+// When a card goes to foundation from camp bi, mark same card blocked for other camp
+function markBlocked(card,bi){
+  G.boards[1-bi].blocked.add(blockKey(card));
 }
 
 // ─── resolveMove ────────────────────────────────────
@@ -456,15 +488,18 @@ function resolveMove(src,dst){
     G.boards[dst.bi].cols[dst.ci].push(...cards);
   } else if(dst.type==='fnd'){
     if(cards.length>1) return false;
+    if(isBlocked(top,srcBi)) return false;     // blocked card can't go to foundation
     const pile=G.foundation[dst.fi];
     if(top.suit!==SUITS[dst.fi]||!canFoundation(top,pile)) return false;
     pile.push(top);
     G.scores[srcBi]++;
+    markBlocked(top,srcBi);                    // mark same card blocked for other camp
     commitSrc(src,fromHand);
     G.moves++; G.selected=null;
     assertNoDuplicates(); checkGameOver(); return true;
   } else if(dst.type==='trash'){
     if(cards.length>1) return false;
+    if(!isBlocked(top,srcBi)) return false;    // only blocked cards can be trashed
     G.trash.push(top);
     commitSrc(src,fromHand);
     G.moves++; G.selected=null;
@@ -490,8 +525,7 @@ function commitSrc(src,fromHand){
 function hasAnyMove(){
   for(let bi=0;bi<2;bi++){
     const bd=G.boards[bi];
-    if(bd.stock.length>0) return true;       // can always draw
-    if(bd.waste.length>0) return true;       // has waste (can always trash)
+    if(bd.stock.length>0||bd.waste.length>0) return true;  // can draw (or reshuffle+draw)
     if(hasTableauMove(bi)) return true;
   }
   return false;
@@ -547,6 +581,8 @@ let suppressClick=false;
 
 function clickStock(bi){
   if(suppressClick) return;
+  const bd=G.boards[bi];
+  if(!bd.stock.length&&!bd.waste.length) return;
   drawCard(bi);
 }
 
@@ -608,10 +644,12 @@ function clickTrash(){
   const sel=G.selected;
   if(!sel) return;
   if(sel.src==='hand'){
-    resolveMove(sel,{type:'trash'});
+    const w=G.boards[sel.bi].waste;
+    if(w.length&&isBlocked(w[w.length-1],sel.bi)) resolveMove(sel,{type:'trash'});
   } else {
     const col=G.boards[sel.bi].cols[sel.ci];
-    if(sel.idx===col.length-1) resolveMove(sel,{type:'trash'});
+    const card=col[sel.idx];
+    if(sel.idx===col.length-1&&isBlocked(card,sel.bi)) resolveMove(sel,{type:'trash'});
   }
   render();
 }
@@ -773,10 +811,11 @@ function unmarkSrc(){if(DRAG)DRAG.sourceEls.forEach(e=>e.classList.remove('dragg
 // ═══════════════════════════════════════════════════════
 function mkCardEl(card,sel,stk,bi){
   const backCls=bi===0?'back-non':bi===1?'back-oui':'';
+  const blocked=bi!=null&&card.faceUp&&isBlocked(card,bi);
   const el=document.createElement('div');
   el.className=['card',
     card.faceUp
-      ?`face-up ${card.red?'red':'black'}${sel?' selected':''}${stk?' sel-stack':''}`
+      ?`face-up ${card.red?'red':'black'}${sel?' selected':''}${stk?' sel-stack':''}${blocked?' blocked':''}`
       :`face-down ${backCls}`
   ].join(' ');
   if(card.faceUp){
@@ -845,10 +884,16 @@ function render(){
     const sg=document.createElement('div'); sg.className='col-grp';
     const sl=document.createElement('div'); sl.className='col-lbl'; sl.textContent='PIOCHE';
     const sb=document.createElement('div');
-    sb.className='stock-btn '+(bd.stock.length?'has':'empty');
-    if(bd.stock.length) sb.addEventListener('click',()=>clickStock(bi));
+    const canReshuffle=!bd.stock.length&&bd.waste.length>0;
+    sb.className='stock-btn '+(bd.stock.length?'has':canReshuffle?'reshuffle':'empty');
+    if(bd.stock.length||canReshuffle) sb.addEventListener('click',()=>clickStock(bi));
+    if(canReshuffle){
+      const ico=document.createElement('span'); ico.textContent='↺';
+      ico.style.cssText='font-size:22px;color:var(--muted)'; sb.appendChild(ico);
+    }
     const sc2=document.createElement('div'); sc2.className='col-cnt';
-    sc2.textContent=bd.stock.length?bd.stock.length+' carte'+(bd.stock.length>1?'s':''):'Vide';
+    sc2.textContent=bd.stock.length?bd.stock.length+' carte'+(bd.stock.length>1?'s':''):
+                    canReshuffle?'Rebrasser':'Vide';
     sg.append(sl,sb,sc2); btEl.appendChild(sg);
 
     // Waste pile group (draw into here, play top card)
