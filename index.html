@@ -27,7 +27,8 @@ body{
 h1{font-family:'Cormorant Garamond',serif;font-size:clamp(15px,2.2vw,21px);
    font-weight:400;letter-spacing:.35em;color:var(--gold);text-transform:uppercase;
    text-shadow:0 0 40px rgba(200,168,75,.3)}
-.subtitle{font-size:13px;color:var(--gold);letter-spacing:.22em;opacity:.7;margin-top:2px;font-family:'Cormorant Garamond',serif;font-style:italic}
+.subtitle{font-size:13px;color:var(--gold);letter-spacing:.22em;opacity:.7;margin-top:2px;
+          font-family:'Cormorant Garamond',serif;font-style:italic}
 .timer{font-size:20px;font-weight:700;color:var(--gold);letter-spacing:.05em;
        font-variant-numeric:tabular-nums;min-width:72px;text-align:right}
 
@@ -44,12 +45,29 @@ h1{font-family:'Cormorant Garamond',serif;font-size:clamp(15px,2.2vw,21px);
 .bal-mid{position:absolute;left:50%;top:-3px;bottom:-3px;
          width:2px;background:#1a3d26;transform:translateX(-50%)}
 .bal-lbl{text-align:center;font-size:9px;color:var(--muted);
-         letter-spacing:.1em;margin-bottom:10px;height:13px}
+         letter-spacing:.1em;margin-bottom:8px;height:13px}
 .bal-lbl.eq{color:#4caf7d}
 
+/* ── Turn indicator ── */
+.turn-bar{display:flex;align-items:center;justify-content:center;gap:16px;
+          margin-bottom:10px;height:22px}
+.turn-chip{font-size:9px;letter-spacing:.2em;text-transform:uppercase;
+           padding:3px 12px;border-radius:99px;border:1px solid;
+           transition:all .25s;font-weight:700}
+.turn-chip.non{border-color:var(--non);color:var(--non)}
+.turn-chip.oui{border-color:var(--oui);color:var(--oui)}
+.turn-chip.active-non{background:var(--non);color:#fff;
+  box-shadow:0 0 12px rgba(224,85,85,.4)}
+.turn-chip.active-oui{background:var(--oui);color:#fff;
+  box-shadow:0 0 12px rgba(91,155,213,.4)}
+.turn-arrow{font-size:11px;color:var(--muted)}
+.skip-notice{font-size:9px;color:var(--muted);letter-spacing:.12em;
+             animation:fadein .3s;text-align:center;margin-bottom:6px;height:12px}
+@keyframes fadein{from{opacity:0}to{opacity:1}}
+
 /* ── 3-column layout ── */
-.game-layout{display:grid;grid-template-columns:1fr 110px 1fr;gap:10px;align-items:start}
-@media(max-width:760px){
+.game-layout{display:grid;grid-template-columns:1fr 90px 1fr;gap:10px;align-items:start}
+@media(max-width:680px){
   .game-layout{grid-template-columns:1fr}
   .center-col{order:-1}
 }
@@ -59,11 +77,16 @@ h1{font-family:'Cormorant Garamond',serif;font-size:clamp(15px,2.2vw,21px);
   background:repeating-linear-gradient(45deg,transparent,transparent 28px,
     rgba(255,255,255,.012) 28px,rgba(255,255,255,.012) 29px),var(--felt2);
   border-radius:10px;padding:10px 8px 14px;
-  display:flex;flex-direction:column;gap:8px;transition:opacity .3s
+  display:flex;flex-direction:column;gap:8px;transition:opacity .3s,border-color .3s
 }
 .board.non{border:1.5px solid rgba(224,85,85,.3)}
 .board.oui{border:1.5px solid rgba(91,155,213,.3)}
-.board.stuck{opacity:.5;pointer-events:none}
+/* Active board gets brighter border */
+.board.non.active-board{border-color:rgba(224,85,85,.7)}
+.board.oui.active-board{border-color:rgba(91,155,213,.7)}
+/* Inactive board dims */
+.board.inactive{opacity:.5;pointer-events:none}
+.board.stuck{opacity:.4;pointer-events:none}
 .board-hdr{display:flex;justify-content:space-between;align-items:center}
 .board-name{font-family:'Cormorant Garamond',serif;font-size:13px;
             letter-spacing:.35em;font-style:italic}
@@ -92,13 +115,16 @@ h1{font-family:'Cormorant Garamond',serif;font-size:clamp(15px,2.2vw,21px);
   border-color:rgba(200,168,75,.35);box-shadow:0 2px 8px rgba(0,0,0,.4)
 }
 .stock-btn.empty{background:transparent;border-color:var(--border);color:var(--muted);cursor:default}
+.stock-btn.reshuffle{
+  background:repeating-linear-gradient(135deg,#1a2d20 0,#1a2d20 8px,#0f1f15 8px,#0f1f15 16px);
+  border-color:rgba(200,168,75,.2);cursor:pointer;
+}
 
 /* ── Center column ── */
-.center-col{display:flex;flex-direction:column;align-items:center;gap:14px;padding-top:30px}
+.center-col{display:flex;flex-direction:column;align-items:center;gap:14px;padding-top:26px}
 .ctr-section{display:flex;flex-direction:column;align-items:center;gap:5px}
 .ctr-lbl{font-size:7px;letter-spacing:.18em;color:var(--muted);text-transform:uppercase}
 .fnd-grid{display:grid;grid-template-columns:repeat(2,var(--cw));gap:5px}
-.trash-cnt{font-size:7px;color:var(--muted);text-align:center;margin-top:2px}
 
 /* ── Tableau columns ── */
 .columns{display:flex;gap:4px;align-items:flex-start;min-height:500px}
@@ -112,12 +138,10 @@ h1{font-family:'Cormorant Garamond',serif;font-size:clamp(15px,2.2vw,21px);
 .card.dragging-source{opacity:.25;pointer-events:none}
 .card.face-down{border:1.5px solid rgba(200,168,75,.18);cursor:default}
 .card.face-down::after{content:'';position:absolute;inset:3px;border-radius:3px}
-/* NON = red back */
 .card.face-down.back-non{
   background:repeating-linear-gradient(135deg,#3d0a0a 0,#3d0a0a 7px,#5c1212 7px,#5c1212 14px);
 }
 .card.face-down.back-non::after{border:1px solid rgba(220,80,80,.22)}
-/* OUI = blue back */
 .card.face-down.back-oui{
   background:repeating-linear-gradient(135deg,#0a1a3d 0,#0a1a3d 7px,#12285c 7px,#12285c 14px);
 }
@@ -137,6 +161,16 @@ h1{font-family:'Cormorant Garamond',serif;font-size:clamp(15px,2.2vw,21px);
 .card-mid{text-align:center;font-size:18px;line-height:1}
 .card-bot{text-align:right;transform:rotate(180deg)}
 
+/* Blocked card — X overlay */
+.card.blocked{cursor:not-allowed}
+.card.blocked::before{
+  content:'✕';position:absolute;inset:0;
+  display:flex;align-items:center;justify-content:center;
+  font-size:24px;font-weight:900;color:rgba(210,40,40,.9);
+  font-family:'Courier Prime',monospace;pointer-events:none;z-index:2;
+  background:rgba(60,0,0,.1);border-radius:4px;
+}
+
 /* Empty slot */
 .slot{width:var(--cw);height:var(--ch);border-radius:5px;border:1.5px dashed;
       cursor:pointer;flex-shrink:0;display:flex;align-items:center;justify-content:center;
@@ -150,23 +184,6 @@ h1{font-family:'Cormorant Garamond',serif;font-size:clamp(15px,2.2vw,21px);
          box-shadow:0 0 0 2px rgba(200,168,75,.3)!important}
 .card.drop-card{box-shadow:0 0 0 2px var(--gold),0 2px 8px var(--card-sh)!important;
                 background:#fffef5!important}
-/* Blocked card X overlay */
-.card.blocked::before{
-  content:'✕';
-  position:absolute;inset:0;
-  display:flex;align-items:center;justify-content:center;
-  font-size:22px;font-weight:900;
-  color:rgba(220,50,50,.85);
-  font-family:'Courier Prime',monospace;
-  pointer-events:none;z-index:2;
-  background:rgba(60,0,0,.12);
-  border-radius:4px;
-}
-/* Stock reshuffle state */
-.stock-btn.reshuffle{
-  background:repeating-linear-gradient(135deg,#1a2d20 0,#1a2d20 8px,#0f1f15 8px,#0f1f15 16px);
-  border-color:rgba(200,168,75,.2);color:var(--muted);cursor:pointer;
-}
 
 /* ── Drag ghost ── */
 #ghost{position:fixed;pointer-events:none;z-index:9999;display:none;
@@ -175,7 +192,7 @@ h1{font-family:'Cormorant Garamond',serif;font-size:clamp(15px,2.2vw,21px);
              pointer-events:none;opacity:1!important;margin-bottom:-36px}
 #ghost .card:last-child{margin-bottom:0}
 
-/* ── New game button ── */
+/* ── Buttons ── */
 .new-btn{display:block;margin:16px auto 0;padding:7px 26px;
          background:transparent;border:1px solid var(--border);border-radius:4px;
          color:var(--muted);font-family:'Courier Prime',monospace;
@@ -254,50 +271,46 @@ h1{font-family:'Cormorant Garamond',serif;font-size:clamp(15px,2.2vw,21px);
 </div>
 <div class="bal-lbl" id="bal-lbl"></div>
 
-<div class="game-layout">
+<!-- Turn indicator -->
+<div class="turn-bar">
+  <span class="turn-chip non" id="chip-non">NON</span>
+  <span class="turn-arrow">›</span>
+  <span class="turn-chip oui" id="chip-oui">OUI</span>
+</div>
+<div class="skip-notice" id="skip-notice"></div>
 
-  <!-- NON board -->
+<div class="game-layout">
   <div class="board non" id="bd-0">
     <div class="board-hdr">
       <span class="board-name">NON</span>
-      <span class="done-badge">TERMINÉ</span>
+      <span class="done-badge">BLOQUÉ</span>
       <span class="board-meta" id="bm-0">0 / 52</span>
     </div>
     <div class="board-top" id="bt-0"></div>
     <div class="columns" id="bc-0"></div>
   </div>
 
-  <!-- Center: Foundation + Trash -->
   <div class="center-col">
     <div class="ctr-section">
       <div class="ctr-lbl">Fondation</div>
       <div class="fnd-grid" id="foundation"></div>
     </div>
-    <div class="ctr-section">
-      <div class="ctr-lbl">Poubelle</div>
-      <div id="trash-slot"></div>
-      <div class="trash-cnt" id="trash-cnt"></div>
-    </div>
   </div>
 
-  <!-- OUI board -->
   <div class="board oui" id="bd-1">
     <div class="board-hdr">
       <span class="board-name">OUI</span>
-      <span class="done-badge">TERMINÉ</span>
+      <span class="done-badge">BLOQUÉ</span>
       <span class="board-meta" id="bm-1">0 / 52</span>
     </div>
     <div class="board-top rev" id="bt-1"></div>
     <div class="columns" id="bc-1"></div>
   </div>
-
 </div>
 
 <button class="new-btn" onclick="newGame()">Nouvelle partie</button>
-
 <div id="ghost"></div>
 
-<!-- Game Over overlay -->
 <div id="go-overlay">
   <div class="go-box">
     <div class="go-title">Partie terminée</div>
@@ -339,20 +352,13 @@ const VALUES   = ['A','2','3','4','5','6','7','8','9','10','J','Q','K'];
 const RED      = new Set(['♥','♦']);
 let _id = 0;
 
-const mkCard = (suit,val) => ({
-  suit,val,num:VALUES.indexOf(val)+1,red:RED.has(suit),faceUp:false,id:_id++
-});
-const shuffle = a => {
-  for(let i=a.length-1;i>0;i--){const j=0|Math.random()*(i+1);[a[i],a[j]]=[a[j],a[i]];}
-  return a;
-};
-const mkDeck  = () => shuffle(SUITS.flatMap(s=>VALUES.map(v=>mkCard(s,v))));
-const deal    = deck => {
+const mkCard   = (s,v) => ({suit:s,val:v,num:VALUES.indexOf(v)+1,red:RED.has(s),faceUp:false,id:_id++});
+const shuffle  = a => { for(let i=a.length-1;i>0;i--){const j=0|Math.random()*(i+1);[a[i],a[j]]=[a[j],a[i]];} return a; };
+const mkDeck   = () => shuffle(SUITS.flatMap(s=>VALUES.map(v=>mkCard(s,v))));
+const deal     = deck => {
   const cols=Array.from({length:7},()=>[]);
   let i=0;
-  for(let c=0;c<7;c++) for(let r=0;r<=c;r++){
-    const card=deck[i++]; card.faceUp=(r===c); cols[c].push(card);
-  }
+  for(let c=0;c<7;c++) for(let r=0;r<=c;r++){const card=deck[i++];card.faceUp=(r===c);cols[c].push(card);}
   return {cols,rest:deck.slice(i)};
 };
 const canStack      = (c,on) => !on?c.num===13:on.faceUp&&on.red!==c.red&&on.num===c.num+1;
@@ -368,30 +374,27 @@ function initState(){
   const b0=deal(d0),b1=deal(d1);
   return {
     boards:[
-      {cols:b0.cols,stock:b0.rest,waste:[],blocked:new Set()},   // NON  bi=0
-      {cols:b1.cols,stock:b1.rest,waste:[],blocked:new Set()},   // OUI  bi=1
+      {cols:b0.cols, stock:b0.rest, waste:[], blocked:new Set()},
+      {cols:b1.cols, stock:b1.rest, waste:[], blocked:new Set()},
     ],
-    foundation:[[],[],[],[]],   // shared, by SUIT_IDX
-    trash:[],                   // shared dump
-    scores:[0,0],               // cards placed on foundation per camp
-    selected:null,              // {src:'hand',bi} | {bi,ci,idx}
+    foundation:[[],[],[],[]],
+    scores:[0,0],
+    turn:0,        // 0=NON, 1=OUI — whose move it is
+    selected:null, // {src:'hand',bi} | {bi,ci,idx}
     moves:0,
-    startTime:Date.now(),
-    elapsed:0,
-    gameOver:false,
+    startTime:Date.now(), elapsed:0, gameOver:false,
   };
 }
 
 function newGame(){
   clearInterval(timerInterval);
   G=initState();
-  lastSaved=-1;
   document.getElementById('go-overlay').classList.remove('show');
   document.getElementById('go-save-btn').disabled=false;
   document.getElementById('go-save-btn').textContent='Sauver';
   document.getElementById('go-name').value='';
-  startTimer();
-  render();
+  document.getElementById('skip-notice').textContent='';
+  startTimer(); render();
 }
 
 // ═══════════════════════════════════════════════════════
@@ -407,12 +410,23 @@ function startTimer(){
     }
   },500);
 }
-const fmtTime = s => `${String(0|s/60).padStart(2,'0')}:${String(s%60).padStart(2,'0')}`;
+const fmtTime = s=>`${String(0|s/60).padStart(2,'0')}:${String(s%60).padStart(2,'0')}`;
 
 // ═══════════════════════════════════════════════════════
-//  INTEGRITY
+//  BLOCKED CARD HELPERS
 // ═══════════════════════════════════════════════════════
-function assertNoDuplicates(){
+const blockKey  = c => `${c.suit}${c.num}`;
+const isBlocked = (card,bi) => G.boards[bi].blocked.has(blockKey(card));
+
+// When camp `bi` plays a card to foundation, mark its twin blocked for the other camp
+function markBlocked(card,bi){
+  G.boards[1-bi].blocked.add(blockKey(card));
+}
+
+// ═══════════════════════════════════════════════════════
+//  INTEGRITY CHECK
+// ═══════════════════════════════════════════════════════
+function assertOK(){
   const seen=new Map();
   const chk=(c,loc)=>{
     if(seen.has(c.id)) console.error(`DOUBLON id=${c.id}(${c.val}${c.suit}):${seen.get(c.id)}&${loc}`);
@@ -420,144 +434,111 @@ function assertNoDuplicates(){
   };
   G.boards.forEach((bd,bi)=>{
     bd.cols.forEach((col,ci)=>col.forEach((c,i)=>chk(c,`b${bi}c${ci}[${i}]`)));
-    bd.waste.forEach((c,i)=>chk(c,`b${bi}wst[${i}]`));
-    bd.stock.forEach((c,i)=>chk(c,`b${bi}stk[${i}]`));
+    bd.waste.forEach((c,i)=>chk(c,`b${bi}w[${i}]`));
+    bd.stock.forEach((c,i)=>chk(c,`b${bi}s[${i}]`));
   });
   G.foundation.forEach((p,fi)=>p.forEach((c,i)=>chk(c,`fnd${fi}[${i}]`)));
-  G.trash.forEach((c,i)=>chk(c,`trash[${i}]`));
-  if(seen.size!==104) console.error(`COUNT:${seen.size}/104`);
+  if(seen.size!==104) console.error(`TOTAL:${seen.size}/104`);
 }
 
 // ═══════════════════════════════════════════════════════
-//  GAME LOGIC
+//  MOVE VALIDITY HELPERS
 // ═══════════════════════════════════════════════════════
 
-function drawCard(bi){
+// Can this card be the BOTTOM of a moving stack (i.e., be selected as source)?
+function canPickUp(card,bi){
+  return card.faceUp && !isBlocked(card,bi);
+}
+
+// Can a card be placed ON TOP of `onto` in camp bi?
+// `onto` = null means empty column (always ok for kings).
+function canDropOnto(onto,bi){
+  if(!onto) return true; // empty slot
+  return !isBlocked(onto,bi); // blocked cards can't receive
+}
+
+// ─── What moves are valid for camp bi? ─────────────────
+// Returns true if at least one card placement exists
+function hasValidPlacement(bi){
   const bd=G.boards[bi];
-  // Reshuffle waste → stock when stock empty
-  if(!bd.stock.length){
-    if(!bd.waste.length) return;
-    // Flip waste back face-down and reshuffle into stock
-    bd.waste.forEach(c=>c.faceUp=false);
-    bd.stock=shuffle(bd.waste);
-    bd.waste=[];
-  }
-  const card=bd.stock.shift();
-  card.faceUp=true;
-  bd.waste.push(card);
-  G.selected={src:'hand',bi};
-  render();
-}
-
-// ─── Blocked card helpers ───────────────────────────
-const blockKey = c => `${c.suit}${c.num}`;
-const isBlocked = (card,bi) => G.boards[bi].blocked.has(blockKey(card));
-
-// When a card goes to foundation from camp bi, mark same card blocked for other camp
-function markBlocked(card,bi){
-  G.boards[1-bi].blocked.add(blockKey(card));
-}
-
-// ─── resolveMove ────────────────────────────────────
-// src: {src:'hand',bi}  |  {bi,ci,idx}
-// dst: {type:'col',bi,ci} | {type:'empty',bi,ci} | {type:'fnd',fi} | {type:'trash'}
-function resolveMove(src,dst){
-  const srcBi = src.src==='hand'?src.bi:src.bi;
-  let cards,fromHand=false;
-
-  if(src.src==='hand'){
-    const w=G.boards[src.bi].waste;
-    if(!w.length) return false;
-    cards=[w[w.length-1]]; fromHand=true;
-  } else {
-    const col=G.boards[src.bi].cols[src.ci];
-    cards=col.slice(src.idx);
-    if(!cards.length||!cards[0].faceUp) return false;
-  }
-  const top=cards[0];
-
-  // Validate
-  if(dst.type==='col'){
-    if(dst.bi!==srcBi) return false;
-    const dc=G.boards[dst.bi].cols[dst.ci];
-    if(!canStack(top, dc.length?dc[dc.length-1]:null)) return false;
-    dc.push(...cards);
-  } else if(dst.type==='empty'){
-    if(dst.bi!==srcBi) return false;
-    if(top.num!==13) return false;
-    G.boards[dst.bi].cols[dst.ci].push(...cards);
-  } else if(dst.type==='fnd'){
-    if(cards.length>1) return false;
-    if(isBlocked(top,srcBi)) return false;     // blocked card can't go to foundation
-    const pile=G.foundation[dst.fi];
-    if(top.suit!==SUITS[dst.fi]||!canFoundation(top,pile)) return false;
-    pile.push(top);
-    G.scores[srcBi]++;
-    markBlocked(top,srcBi);                    // mark same card blocked for other camp
-    commitSrc(src,fromHand);
-    G.moves++; G.selected=null;
-    assertNoDuplicates(); checkGameOver(); return true;
-  } else if(dst.type==='trash'){
-    if(cards.length>1) return false;
-    if(!isBlocked(top,srcBi)) return false;    // only blocked cards can be trashed
-    G.trash.push(top);
-    commitSrc(src,fromHand);
-    G.moves++; G.selected=null;
-    assertNoDuplicates(); checkGameOver(); return true;
-  } else return false;
-
-  commitSrc(src,fromHand);
-  G.moves++; G.selected=null;
-  assertNoDuplicates(); checkGameOver(); return true;
-}
-
-function commitSrc(src,fromHand){
-  if(fromHand){
-    G.boards[src.bi].waste.pop();
-  } else {
-    const fc=G.boards[src.bi].cols[src.ci];
-    fc.splice(src.idx);
-    if(fc.length) fc[fc.length-1].faceUp=true;
-  }
-}
-
-// ─── Game-over detection ────────────────────────────
-function hasAnyMove(){
-  for(let bi=0;bi<2;bi++){
-    const bd=G.boards[bi];
-    if(bd.stock.length>0||bd.waste.length>0) return true;  // can draw (or reshuffle+draw)
-    if(hasTableauMove(bi)) return true;
-  }
-  return false;
-}
-
-function hasTableauMove(bi){
-  const cols=G.boards[bi].cols;
   const fnd=G.foundation;
+
+  // Waste top → foundation or column?
+  if(bd.waste.length){
+    const w=bd.waste[bd.waste.length-1];
+    if(!isBlocked(w,bi)){
+      if(canFoundation(w,fnd[SUIT_IDX[w.suit]])) return true;
+      for(let ci=0;ci<7;ci++){
+        const col=bd.cols[ci];
+        const top=col.length?col[col.length-1]:null;
+        if(canDropOnto(top,bi)&&canStack(w,top)) return true;
+      }
+    }
+  }
+
+  // Tableau moves
   for(let ci=0;ci<7;ci++){
-    const col=cols[ci];
-    if(!col.length) continue;
-    const top=col[col.length-1];
-    if(!top.faceUp) continue;
-    // Top card to foundation?
-    if(canFoundation(top,fnd[SUIT_IDX[top.suit]])) return true;
-    // Any face-up substack to another col?
+    const col=bd.cols[ci];
     for(let idx=col.length-1;idx>=0;idx--){
-      if(!col[idx].faceUp) break;
-      const mv=col[idx];
+      const card=col[idx];
+      if(!card.faceUp) break;
+      if(!canPickUp(card,bi)) continue; // blocked can't be source
+
+      const moving=col.slice(idx);
+      const mTop=moving[0];
+
+      // To foundation (only single card)
+      if(moving.length===1&&canFoundation(mTop,fnd[SUIT_IDX[mTop.suit]])) return true;
+
+      // To another column
       for(let dci=0;dci<7;dci++){
         if(dci===ci) continue;
-        const dc=cols[dci];
-        if(canStack(mv,dc.length?dc[dc.length-1]:null)) return true;
+        const dc=bd.cols[dci];
+        const onto=dc.length?dc[dc.length-1]:null;
+        if(canDropOnto(onto,bi)&&canStack(mTop,onto)) return true;
       }
     }
   }
   return false;
 }
 
+function canDraw(bi){
+  const bd=G.boards[bi];
+  return bd.stock.length>0||(bd.waste.length>0); // can reshuffle if waste has cards
+}
+
+// ─── TURN MANAGEMENT ────────────────────────────────────
+function nextTurn(){
+  const other=1-G.turn;
+
+  // Try to give turn to other player
+  if(hasValidPlacement(other)||canDraw(other)){
+    G.turn=other;
+    G.selected=null;
+    document.getElementById('skip-notice').textContent='';
+    checkGameOver();
+    return;
+  }
+
+  // Other player can't move — try keeping turn with current player
+  if(hasValidPlacement(G.turn)||canDraw(G.turn)){
+    // Show skip notice
+    const names=['NON','OUI'];
+    document.getElementById('skip-notice').textContent=
+      `${names[other]} n'a plus de mouvement — ${names[G.turn]} rejoue`;
+    checkGameOver();
+    return;
+  }
+
+  // Neither can move
+  G.gameOver=true;
+  clearInterval(timerInterval);
+  setTimeout(showGameOver,700);
+}
+
 function checkGameOver(){
   if(G.gameOver) return;
-  if(!hasAnyMove()){
+  if(!hasValidPlacement(0)&&!canDraw(0)&&!hasValidPlacement(1)&&!canDraw(1)){
     G.gameOver=true;
     clearInterval(timerInterval);
     setTimeout(showGameOver,700);
@@ -575,21 +556,106 @@ function showGameOver(){
 }
 
 // ═══════════════════════════════════════════════════════
+//  DRAW
+// ═══════════════════════════════════════════════════════
+function drawCard(bi){
+  if(bi!==G.turn) return; // only active player can draw
+  const bd=G.boards[bi];
+  if(!bd.stock.length){
+    if(!bd.waste.length) return;
+    // Reshuffle waste into stock
+    bd.waste.forEach(c=>c.faceUp=false);
+    bd.stock=shuffle(bd.waste);
+    bd.waste=[];
+  }
+  const card=bd.stock.shift();
+  card.faceUp=true;
+  bd.waste.push(card);
+  G.selected={src:'hand',bi};
+  // Drawing does NOT alternate turn
+  render();
+}
+
+// ═══════════════════════════════════════════════════════
+//  RESOLVE MOVE  (shared by click + drag)
+// ═══════════════════════════════════════════════════════
+// src: {src:'hand',bi} | {bi,ci,idx}
+// dst: {type:'col',bi,ci} | {type:'empty',bi,ci} | {type:'fnd',fi}
+function resolveMove(src,dst){
+  const bi=src.src==='hand'?src.bi:src.bi;
+  if(bi!==G.turn) return false; // wrong player
+
+  let cards, fromHand=false;
+  if(src.src==='hand'){
+    const w=G.boards[bi].waste;
+    if(!w.length) return false;
+    const top=w[w.length-1];
+    if(isBlocked(top,bi)) return false; // blocked waste card: immovable
+    cards=[top]; fromHand=true;
+  } else {
+    const col=G.boards[bi].cols[src.ci];
+    const card=col[src.idx];
+    if(!canPickUp(card,bi)) return false; // blocked or face-down
+    cards=col.slice(src.idx);
+  }
+  const topCard=cards[0];
+
+  if(dst.type==='col'){
+    if(dst.bi!==bi) return false;
+    const dc=G.boards[bi].cols[dst.ci];
+    const onto=dc.length?dc[dc.length-1]:null;
+    if(!canDropOnto(onto,bi)) return false; // can't drop onto blocked card
+    if(!canStack(topCard,onto)) return false;
+    dc.push(...cards);
+  } else if(dst.type==='empty'){
+    if(dst.bi!==bi) return false;
+    if(topCard.num!==13) return false;
+    G.boards[bi].cols[dst.ci].push(...cards);
+  } else if(dst.type==='fnd'){
+    if(cards.length>1) return false;
+    if(isBlocked(topCard,bi)) return false;
+    const pile=G.foundation[dst.fi];
+    if(topCard.suit!==SUITS[dst.fi]||!canFoundation(topCard,pile)) return false;
+    pile.push(topCard);
+    G.scores[bi]++;
+    markBlocked(topCard,bi);
+    commitSrc(src,fromHand,bi);
+    G.moves++; G.selected=null;
+    assertOK(); nextTurn(); render(); return true;
+  } else return false;
+
+  commitSrc(src,fromHand,bi);
+  G.moves++; G.selected=null;
+  assertOK(); nextTurn(); render(); return true;
+}
+
+function commitSrc(src,fromHand,bi){
+  if(fromHand){
+    G.boards[bi].waste.pop();
+  } else {
+    const fc=G.boards[bi].cols[src.ci];
+    fc.splice(src.idx);
+    if(fc.length) fc[fc.length-1].faceUp=true;
+  }
+}
+
+// ═══════════════════════════════════════════════════════
 //  CLICK HANDLERS
 // ═══════════════════════════════════════════════════════
 let suppressClick=false;
 
 function clickStock(bi){
   if(suppressClick) return;
-  const bd=G.boards[bi];
-  if(!bd.stock.length&&!bd.waste.length) return;
   drawCard(bi);
 }
 
 function clickHand(bi){
   if(suppressClick) return;
+  if(bi!==G.turn) return;
   const w=G.boards[bi].waste;
   if(!w.length) return;
+  const top=w[w.length-1];
+  if(isBlocked(top,bi)) return; // blocked: not selectable
   const sel=G.selected;
   if(sel?.src==='hand'&&sel.bi===bi) G.selected=null;
   else G.selected={src:'hand',bi};
@@ -598,20 +664,30 @@ function clickHand(bi){
 
 function clickCard(bi,ci,idx){
   if(suppressClick) return;
+  if(bi!==G.turn) return;
   const col=G.boards[bi].cols[ci];
   const card=col[idx];
   const sel=G.selected;
-  // Flip
+
+  // Flip face-down top
   if(!card.faceUp){
-    if(idx===col.length-1){card.faceUp=true;G.moves++;checkGameOver();}
+    if(idx===col.length-1){card.faceUp=true; G.moves++; nextTurn();}
     render(); return;
   }
+
+  // Blocked card: never selectable as source
+  if(isBlocked(card,bi)){
+    G.selected=null; render(); return;
+  }
+
   if(!sel){G.selected={bi,ci,idx};render();return;}
+
   // Deselect same
   if(sel.src!=='hand'&&sel.bi===bi&&sel.ci===ci&&sel.idx===idx){
     G.selected=null;render();return;
   }
-  // Try move
+
+  // Try to place
   const ok=resolveMove(sel,{type:'col',bi,ci});
   if(!ok) G.selected={bi,ci,idx};
   render();
@@ -619,104 +695,84 @@ function clickCard(bi,ci,idx){
 
 function clickEmpty(bi,ci){
   if(suppressClick) return;
+  if(bi!==G.turn) return;
   if(G.selected) resolveMove(G.selected,{type:'empty',bi,ci});
+  else {
+    // Try waste top as king
+    const w=G.boards[bi].waste;
+    if(w.length&&!isBlocked(w[w.length-1],bi))
+      resolveMove({src:'hand',bi},{type:'empty',bi,ci});
+  }
   render();
 }
 
 function clickFoundation(fi){
   if(suppressClick) return;
   const sel=G.selected;
-  if(!sel){
-    // Try either board's hand
-    for(let bi=0;bi<2;bi++){
-      if(G.boards[bi].waste.length){
-        if(resolveMove({src:'hand',bi},{type:'fnd',fi})){render();return;}
-      }
-    }
-    return;
-  }
-  resolveMove(sel,{type:'fnd',fi});
-  render();
-}
-
-function clickTrash(){
-  if(suppressClick) return;
-  const sel=G.selected;
-  if(!sel) return;
-  if(sel.src==='hand'){
-    const w=G.boards[sel.bi].waste;
-    if(w.length&&isBlocked(w[w.length-1],sel.bi)) resolveMove(sel,{type:'trash'});
+  const bi=G.turn;
+  if(sel){
+    resolveMove(sel,{type:'fnd',fi});
   } else {
-    const col=G.boards[sel.bi].cols[sel.ci];
-    const card=col[sel.idx];
-    if(sel.idx===col.length-1&&isBlocked(card,sel.bi)) resolveMove(sel,{type:'trash'});
+    // Try waste top
+    const w=G.boards[bi].waste;
+    if(w.length) resolveMove({src:'hand',bi},{type:'fnd',fi});
   }
   render();
 }
 
 // ═══════════════════════════════════════════════════════
-//  SCOREBOARD  (window.storage, shared)
+//  SCOREBOARD
 // ═══════════════════════════════════════════════════════
 let lastSaved=-1;
-const SCORE_KEY='deux-solitudes-scores-v2';
+const SCORE_KEY='deux-solitudes-v3';
 
 async function loadScoreboard(){
-  let entries=[];
-  try{const r=await window.storage.get(SCORE_KEY,true);if(r)entries=JSON.parse(r.value);}
-  catch(e){}
-  renderSB(entries);
+  let e=[];
+  try{const r=await window.storage.get(SCORE_KEY,true);if(r)e=JSON.parse(r.value);}catch(_){}
+  renderSB(e);
 }
-
 async function saveScore(){
   const name=document.getElementById('go-name').value.trim();
   if(!name) return;
-  const btn=document.getElementById('go-save-btn');
-  btn.disabled=true;
+  const btn=document.getElementById('go-save-btn'); btn.disabled=true;
   const entry={name,ecart:Math.abs(G.scores[0]-G.scores[1]),time:G.elapsed,
                date:new Date().toLocaleDateString('fr-CA')};
-  let entries=[];
-  try{const r=await window.storage.get(SCORE_KEY,true);if(r)entries=JSON.parse(r.value);}
-  catch(e){}
-  entries.push(entry);
-  entries.sort((a,b)=>a.ecart-b.ecart||a.time-b.time);
-  if(entries.length>20) entries=entries.slice(0,20);
-  lastSaved=entries.indexOf(entry);
-  try{await window.storage.set(SCORE_KEY,JSON.stringify(entries),true);}
-  catch(e){}
-  renderSB(entries);
-  btn.textContent='✓ Sauvé';
+  let e=[];
+  try{const r=await window.storage.get(SCORE_KEY,true);if(r)e=JSON.parse(r.value);}catch(_){}
+  e.push(entry); e.sort((a,b)=>a.ecart-b.ecart||a.time-b.time);
+  if(e.length>20)e=e.slice(0,20);
+  lastSaved=e.indexOf(entry);
+  try{await window.storage.set(SCORE_KEY,JSON.stringify(e),true);}catch(_){}
+  renderSB(e); btn.textContent='✓ Sauvé';
 }
-
-function renderSB(entries){
-  const tbody=document.getElementById('sb-body');
-  tbody.innerHTML='';
-  if(!entries.length){
-    tbody.innerHTML='<tr><td colspan="4" style="text-align:center;color:var(--muted);padding:10px">Aucun score enregistré</td></tr>';
+function renderSB(e){
+  const tbody=document.getElementById('sb-body'); tbody.innerHTML='';
+  if(!e.length){
+    tbody.innerHTML='<tr><td colspan="4" style="text-align:center;color:var(--muted);padding:10px">Aucun score</td></tr>';
     return;
   }
-  entries.slice(0,10).forEach((e,i)=>{
+  e.slice(0,10).forEach((en,i)=>{
     const tr=document.createElement('tr');
-    if(i===lastSaved) tr.className='hl';
-    tr.innerHTML=`<td class="rk">${i+1}</td><td>${e.name||'—'}</td>`+
-                 `<td class="ec">${e.ecart}</td><td class="tm">${fmtTime(e.time)}</td>`;
+    if(i===lastSaved)tr.className='hl';
+    tr.innerHTML=`<td class="rk">${i+1}</td><td>${en.name}</td><td class="ec">${en.ecart}</td><td class="tm">${fmtTime(en.time)}</td>`;
     tbody.appendChild(tr);
   });
 }
 
 // ═══════════════════════════════════════════════════════
-//  DRAG & DROP  — Pointer Events API (mouse + touch)
+//  DRAG & DROP  — Pointer Events (mouse + touch)
 // ═══════════════════════════════════════════════════════
 const DRAG_THRESHOLD=6;
 const ghost=document.getElementById('ghost');
 let DRAG=null;
-const DSM=new Map(); // drag source map: key→[els]
+const DSM=new Map();
 
 const srcKey=src=>src.src==='hand'?`h${src.bi}`:`c${src.bi}-${src.ci}-${src.idx}`;
 
 function buildGhost(cards){
   ghost.innerHTML='';
-  cards.forEach(c=>{const el=mkCardEl(c,false,false);el.style.position='relative';ghost.appendChild(el);});
-  ghost.style.display='block';ghost.style.width='var(--cw)';
+  cards.forEach(c=>{const el=mkCardEl(c,false,false,null);el.style.position='relative';ghost.appendChild(el);});
+  ghost.style.display='block'; ghost.style.width='var(--cw)';
 }
 function moveGhost(x,y){ghost.style.left=(x-DRAG.grabX)+'px';ghost.style.top=(y-DRAG.grabY)+'px';}
 function hideGhost(){ghost.style.display='none';ghost.innerHTML='';}
@@ -733,19 +789,28 @@ function highlightDrop(x,y){
   clearHL(); if(!DRAG) return;
   const el=findDrop(x,y); if(!el) return;
   const d=el.dataset;
+  const bi=DRAG.src.src==='hand'?DRAG.src.bi:DRAG.src.bi;
+  if(bi!==G.turn) return;
   let dst;
   if(d.drop==='col')     dst={type:'col',  bi:+d.bi,ci:+d.ci};
   else if(d.drop==='mt') dst={type:'empty',bi:+d.bi,ci:+d.ci};
   else if(d.drop==='fn') dst={type:'fnd',  fi:+d.fi};
-  else if(d.drop==='tr') dst={type:'trash'};
   else return;
 
-  const src=DRAG.src; const bi=src.src==='hand'?src.bi:src.bi; const top=DRAG.cards[0];
+  const top=DRAG.cards[0];
   let ok=false;
-  if(dst.type==='col'){if(dst.bi===bi){const dc=G.boards[dst.bi].cols[dst.ci];ok=canStack(top,dc.length?dc[dc.length-1]:null);}}
-  else if(dst.type==='empty'){ok=(dst.bi===bi&&top.num===13);}
-  else if(dst.type==='fnd'){if(DRAG.cards.length===1){const p=G.foundation[dst.fi];ok=top.suit===SUITS[dst.fi]&&canFoundation(top,p);}}
-  else if(dst.type==='trash'){ok=DRAG.cards.length===1;}
+  if(dst.type==='col'){
+    if(dst.bi===bi){
+      const dc=G.boards[bi].cols[dst.ci];
+      const onto=dc.length?dc[dc.length-1]:null;
+      ok=canDropOnto(onto,bi)&&canStack(top,onto);
+    }
+  } else if(dst.type==='empty'){
+    ok=dst.bi===bi&&top.num===13;
+  } else if(dst.type==='fnd'){
+    ok=DRAG.cards.length===1&&!isBlocked(top,bi)&&
+       top.suit===SUITS[dst.fi]&&canFoundation(top,G.foundation[dst.fi]);
+  }
 
   if(ok){DRAG.dropEl=el;el.classList.add(d.drop==='col'?'drop-card':'drop-ok');}
 }
@@ -753,7 +818,10 @@ function highlightDrop(x,y){
 function attachDrag(el,src,getCards){
   el.addEventListener('pointerdown',e=>{
     if(e.button!==0&&e.pointerType==='mouse') return;
-    const cards=getCards(); if(!cards[0]?.faceUp) return;
+    const bi=src.src==='hand'?src.bi:src.bi;
+    if(bi!==G.turn) return;
+    const cards=getCards();
+    if(!cards[0]?.faceUp||isBlocked(cards[0],bi)) return;
     e.stopPropagation(); el.setPointerCapture(e.pointerId);
     const r=el.getBoundingClientRect();
     DRAG={pointerId:e.pointerId,src,cards,startX:e.clientX,startY:e.clientY,
@@ -774,13 +842,12 @@ function attachDrag(el,src,getCards){
     e.stopPropagation();
     if(DRAG.isDragging){
       suppressClick=true; setTimeout(()=>suppressClick=false,150);
-      const dropEl=findDrop(e.clientX,e.clientY);
-      if(dropEl?.dataset.drop){
-        const d=dropEl.dataset; let dst;
+      const de=findDrop(e.clientX,e.clientY);
+      if(de?.dataset.drop){
+        const d=de.dataset; let dst;
         if(d.drop==='col')     dst={type:'col',  bi:+d.bi,ci:+d.ci};
         else if(d.drop==='mt') dst={type:'empty',bi:+d.bi,ci:+d.ci};
         else if(d.drop==='fn') dst={type:'fnd',  fi:+d.fi};
-        else if(d.drop==='tr') dst={type:'trash'};
         if(dst) resolveMove(DRAG.src,dst);
       }
       clearHL(); unmarkSrc(); hideGhost(); render();
@@ -833,7 +900,7 @@ function render(){
   const sc=G.scores; const tot=sc[0]+sc[1];
   const pct=tot>0?sc[0]/tot:.5; const diff=Math.abs(sc[0]-sc[1]);
 
-  // Balance
+  // Balance bar
   document.getElementById('sc-non').textContent=sc[0];
   document.getElementById('sc-oui').textContent=sc[1];
   document.getElementById('bal-fill').style.width=`${pct*100}%`;
@@ -842,12 +909,18 @@ function render(){
   else if(diff>0){lbl.textContent=`écart : ${diff}`;lbl.className='bal-lbl';}
   else lbl.textContent='';
 
+  // Turn chips
+  const chipN=document.getElementById('chip-non');
+  const chipO=document.getElementById('chip-oui');
+  chipN.className='turn-chip non'+(G.turn===0?' active-non':'');
+  chipO.className='turn-chip oui'+(G.turn===1?' active-oui':'');
+
   // Foundation
   const fndEl=document.getElementById('foundation'); fndEl.innerHTML='';
   SUITS.forEach((suit,fi)=>{
     const pile=G.foundation[fi];
     if(pile.length){
-      const el=mkCardEl(pile[pile.length-1],false,false);
+      const el=mkCardEl(pile[pile.length-1],false,false,null);
       el.classList.add('inline'); el.dataset.drop='fn'; el.dataset.fi=fi;
       el.addEventListener('click',()=>clickFoundation(fi)); fndEl.appendChild(el);
     } else {
@@ -857,36 +930,26 @@ function render(){
     }
   });
 
-  // Trash
-  const ts=document.getElementById('trash-slot'); ts.innerHTML='';
-  const tc=document.getElementById('trash-cnt');
-  if(G.trash.length){
-    const top=G.trash[G.trash.length-1];
-    const el=mkCardEl(top,false,false); el.classList.add('inline');
-    el.dataset.drop='tr'; el.addEventListener('click',clickTrash); ts.appendChild(el);
-    tc.textContent=G.trash.length+' carte'+(G.trash.length>1?'s':'');
-  } else {
-    const s=document.createElement('div'); s.className='slot';
-    s.dataset.drop='tr'; s.addEventListener('click',clickTrash); ts.appendChild(s);
-    tc.textContent='';
-  }
-
   // Boards
   G.boards.forEach((bd,bi)=>{
-    const stuck=!bd.stock.length&&!bd.waste.length&&!hasTableauMove(bi);
-    document.getElementById(`bd-${bi}`).classList.toggle('stuck',stuck);
+    const isActive=bi===G.turn;
+    const stuck=!hasValidPlacement(bi)&&!canDraw(bi);
+    const bEl=document.getElementById(`bd-${bi}`);
+    bEl.classList.toggle('stuck',stuck&&!isActive);
+    bEl.classList.toggle('inactive',!isActive);
+    bEl.classList.toggle('active-board',isActive);
     document.getElementById(`bm-${bi}`).textContent=`${sc[bi]} / 52`;
 
-    // Top row: stock + hand
+    // Board top: stock + waste hand
     const btEl=document.getElementById(`bt-${bi}`); btEl.innerHTML='';
 
-    // Stock group
+    // Stock
     const sg=document.createElement('div'); sg.className='col-grp';
     const sl=document.createElement('div'); sl.className='col-lbl'; sl.textContent='PIOCHE';
     const sb=document.createElement('div');
     const canReshuffle=!bd.stock.length&&bd.waste.length>0;
     sb.className='stock-btn '+(bd.stock.length?'has':canReshuffle?'reshuffle':'empty');
-    if(bd.stock.length||canReshuffle) sb.addEventListener('click',()=>clickStock(bi));
+    if((bd.stock.length||canReshuffle)&&isActive) sb.addEventListener('click',()=>clickStock(bi));
     if(canReshuffle){
       const ico=document.createElement('span'); ico.textContent='↺';
       ico.style.cssText='font-size:22px;color:var(--muted)'; sb.appendChild(ico);
@@ -896,26 +959,29 @@ function render(){
                     canReshuffle?'Rebrasser':'Vide';
     sg.append(sl,sb,sc2); btEl.appendChild(sg);
 
-    // Waste pile group (draw into here, play top card)
+    // Waste (hand)
     const hg=document.createElement('div'); hg.className='col-grp';
-    const wasteTop=bd.waste.length?bd.waste[bd.waste.length-1]:null;
+    const wTop=bd.waste.length?bd.waste[bd.waste.length-1]:null;
+    const wBlocked=wTop?isBlocked(wTop,bi):false;
     const hl=document.createElement('div');
-    hl.className='col-lbl'+(wasteTop?' active':''); hl.textContent=wasteTop?'EN MAIN':'—';
+    hl.className='col-lbl'+(wTop&&!wBlocked?' active':'');
+    hl.textContent=wTop?'EN MAIN':'—';
     hg.appendChild(hl);
 
-    if(wasteTop){
+    if(wTop){
       const handSel=sel?.src==='hand'&&sel.bi===bi;
-      const el=mkCardEl(wasteTop,handSel,false,bi); el.classList.add('inline');
-      const hsrc={src:'hand',bi};
-      el.addEventListener('click',()=>clickHand(bi));
-      attachDrag(el,hsrc,()=>[wasteTop]);
-      const k=srcKey(hsrc); DSM.set(k,[el]);
+      const el=mkCardEl(wTop,handSel&&!wBlocked,false,bi); el.classList.add('inline');
+      if(!wBlocked&&isActive){
+        const hsrc={src:'hand',bi};
+        el.addEventListener('click',()=>clickHand(bi));
+        attachDrag(el,hsrc,()=>[wTop]);
+        DSM.set(srcKey(hsrc),[el]);
+      }
       hg.appendChild(el);
     } else {
       const s=document.createElement('div'); s.className='slot'; s.style.opacity='.28';
       hg.appendChild(s);
     }
-    // Show waste depth indicator
     const wdepth=document.createElement('div'); wdepth.className='col-cnt';
     wdepth.textContent=bd.waste.length>1?`+${bd.waste.length-1}`:' ';
     hg.appendChild(wdepth);
@@ -928,7 +994,7 @@ function render(){
       if(!col.length){
         const s=document.createElement('div'); s.className='slot'; s.style.position='relative';
         s.dataset.drop='mt'; s.dataset.bi=bi; s.dataset.ci=ci;
-        s.addEventListener('click',()=>clickEmpty(bi,ci));
+        if(isActive) s.addEventListener('click',()=>clickEmpty(bi,ci));
         wrap.style.height='var(--ch)'; wrap.appendChild(s);
         colsEl.appendChild(wrap); return;
       }
@@ -937,12 +1003,19 @@ function render(){
       let y=0;
       col.forEach((card,i)=>{
         const isTop=i===col.length-1;
-        const isSel=sel&&sel.src!=='hand'&&sel.bi===bi&&sel.ci===ci&&sel.idx===i;
+        const blocked=card.faceUp&&isBlocked(card,bi);
+        const isSel=sel&&sel.src!=='hand'&&sel.bi===bi&&sel.ci===ci&&sel.idx===i&&!blocked;
         const isStk=sel&&sel.src!=='hand'&&sel.bi===bi&&sel.ci===ci&&sel.idx!=null&&i>sel.idx;
         const el=mkCardEl(card,isSel,isStk,bi); el.style.top=y+'px';
-        if(isTop&&card.faceUp){el.dataset.drop='col';el.dataset.bi=bi;el.dataset.ci=ci;}
-        el.addEventListener('click',()=>clickCard(bi,ci,i));
-        if(card.faceUp){
+
+        // Drop target: top card that is NOT blocked
+        if(isTop&&card.faceUp&&!blocked){
+          el.dataset.drop='col'; el.dataset.bi=bi; el.dataset.ci=ci;
+        }
+        if(isActive) el.addEventListener('click',()=>clickCard(bi,ci,i));
+
+        // Draggable: face-up, not blocked
+        if(card.faceUp&&!blocked&&isActive){
           const csrc={bi,ci,idx:i};
           attachDrag(el,csrc,()=>[...col.slice(i)]);
           const k=srcKey(csrc); if(!DSM.has(k))DSM.set(k,[]); DSM.get(k).push(el);
@@ -955,7 +1028,7 @@ function render(){
   });
 }
 
-// ── Boot ───────────────────────────────────────────────
+// ── Boot ──────────────────────────────────────────────
 newGame();
 </script>
 </body>
