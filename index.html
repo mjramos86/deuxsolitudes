@@ -34,7 +34,7 @@ h1{font-family:'Cormorant Garamond',serif;font-size:clamp(15px,2.2vw,21px);
 
 /* ── Balance bar ── */
 .bal-row{display:flex;align-items:center;gap:10px;margin-bottom:4px}
-.bal-score{font-size:13px;font-weight:700;width:36px;flex-shrink:0}
+.bal-score{font-size:13px;font-weight:700;width:50px;flex-shrink:0}
 .bal-score.non{color:var(--non);text-align:right}
 .bal-score.oui{color:var(--oui)}
 .bal-track{flex:1;height:6px;background:#0d1f16;border-radius:99px;
@@ -316,9 +316,9 @@ h1{font-family:'Cormorant Garamond',serif;font-size:clamp(15px,2.2vw,21px);
     <div class="go-title">Partie terminée</div>
     <div class="go-scores">
       <div class="go-sbox"><div class="go-camp non">NON</div>
-        <span class="go-num" id="go-non">0</span><span class="go-den"> / 52</span></div>
+        <span class="go-num" id="go-non">0</span><span class="go-den" id="go-non-pct">%</span></div>
       <div class="go-sbox"><div class="go-camp oui">OUI</div>
-        <span class="go-num" id="go-oui">0</span><span class="go-den"> / 52</span></div>
+        <span class="go-num" id="go-oui">0</span><span class="go-den" id="go-oui-pct">%</span></div>
     </div>
     <div class="go-stats">
       <div class="go-stat"><div class="go-stat-lbl">Écart</div><div class="go-stat-val" id="go-ecart">—</div></div>
@@ -547,9 +547,15 @@ function checkGameOver(){
 
 function showGameOver(){
   const ecart=Math.abs(G.scores[0]-G.scores[1]);
-  document.getElementById('go-non').textContent=G.scores[0];
-  document.getElementById('go-oui').textContent=G.scores[1];
-  document.getElementById('go-ecart').textContent=ecart;
+  const gTot=G.scores[0]+G.scores[1];
+  const gNonPct=gTot>0?(G.scores[0]/gTot*100).toFixed(1):50;
+  const gOuiPct=gTot>0?(G.scores[1]/gTot*100).toFixed(1):50;
+  document.getElementById('go-non').textContent=gNonPct;
+  document.getElementById('go-non-pct').textContent='%';
+  document.getElementById('go-oui').textContent=gOuiPct;
+  document.getElementById('go-oui-pct').textContent='%';
+  const ecartPct=gTot>0?Math.abs(G.scores[0]-G.scores[1])/gTot*100:0;
+  document.getElementById('go-ecart').textContent=ecartPct.toFixed(1)+'pp';
   document.getElementById('go-temps').textContent=fmtTime(G.elapsed);
   loadScoreboard();
   document.getElementById('go-overlay').classList.add('show');
@@ -735,7 +741,8 @@ async function saveScore(){
   const name=document.getElementById('go-name').value.trim();
   if(!name) return;
   const btn=document.getElementById('go-save-btn'); btn.disabled=true;
-  const entry={name,ecart:Math.abs(G.scores[0]-G.scores[1]),time:G.elapsed,
+  const gT=G.scores[0]+G.scores[1]; const ecartPctSave=gT>0?+(Math.abs(G.scores[0]-G.scores[1])/gT*100).toFixed(1):0;
+  const entry={name,ecart:ecartPctSave,time:G.elapsed,
                date:new Date().toLocaleDateString('fr-CA')};
   let e=[];
   try{const r=await window.storage.get(SCORE_KEY,true);if(r)e=JSON.parse(r.value);}catch(_){}
@@ -754,7 +761,7 @@ function renderSB(e){
   e.slice(0,10).forEach((en,i)=>{
     const tr=document.createElement('tr');
     if(i===lastSaved)tr.className='hl';
-    tr.innerHTML=`<td class="rk">${i+1}</td><td>${en.name}</td><td class="ec">${en.ecart}</td><td class="tm">${fmtTime(en.time)}</td>`;
+    tr.innerHTML=`<td class="rk">${i+1}</td><td>${en.name}</td><td class="ec">${en.ecart}pp</td><td class="tm">${fmtTime(en.time)}</td>`;
     tbody.appendChild(tr);
   });
 }
@@ -901,12 +908,15 @@ function render(){
   const pct=tot>0?sc[0]/tot:.5; const diff=Math.abs(sc[0]-sc[1]);
 
   // Balance bar
-  document.getElementById('sc-non').textContent=sc[0];
-  document.getElementById('sc-oui').textContent=sc[1];
+  const nonPct=tot>0?Math.round(sc[0]/tot*1000)/10:50;
+  const ouiPct=tot>0?Math.round(sc[1]/tot*1000)/10:50;
+  document.getElementById('sc-non').textContent=nonPct.toFixed(1)+'%';
+  document.getElementById('sc-oui').textContent=ouiPct.toFixed(1)+'%';
   document.getElementById('bal-fill').style.width=`${pct*100}%`;
   const lbl=document.getElementById('bal-lbl');
-  if(diff===0&&tot>0){lbl.textContent='⚖ Équilibre parfait';lbl.className='bal-lbl eq';}
-  else if(diff>0){lbl.textContent=`écart : ${diff}`;lbl.className='bal-lbl';}
+  const pctDiff=Math.abs(nonPct-ouiPct);
+  if(pctDiff===0&&tot>0){lbl.textContent='⚖ Référendum parfait — 50 / 50';lbl.className='bal-lbl eq';}
+  else if(tot>0){lbl.textContent=`écart : ${pctDiff.toFixed(1)} pp`;lbl.className='bal-lbl';}
   else lbl.textContent='';
 
   // Turn chips
@@ -938,7 +948,7 @@ function render(){
     bEl.classList.toggle('stuck',stuck&&!isActive);
     bEl.classList.toggle('inactive',!isActive);
     bEl.classList.toggle('active-board',isActive);
-    document.getElementById(`bm-${bi}`).textContent=`${sc[bi]} / 52`;
+    document.getElementById(`bm-${bi}`).textContent=`${sc[bi]} carte${sc[bi]!==1?'s':''}`;
 
     // Board top: stock + waste hand
     const btEl=document.getElementById(`bt-${bi}`); btEl.innerHTML='';
