@@ -11,7 +11,7 @@
   --felt:#0a1f14;--felt2:#0d2518;--border:#1a3d26;
   --gold:#c8a84b;--gold2:#e8c96b;--red:#c0392b;--bluecol:#1a3d7c;
   --text:#d4c9a8;--muted:#4a6355;--card-bg:#f5f0e8;--card-sh:rgba(0,0,0,.45);
-  --non:#e05555;--oui:#5b9bd5;--cw:48px;--ch:68px;
+  --non:#e05555;--oui:#5b9bd5;--cw:72px;--ch:102px;
 }
 html{background:var(--felt)}
 body{
@@ -19,7 +19,7 @@ body{
   background:radial-gradient(ellipse at 20% 10%,#0f2d1a 0%,transparent 60%),
              radial-gradient(ellipse at 80% 90%,#071510 0%,transparent 60%),var(--felt);
   color:var(--text);min-height:100vh;padding:10px 8px 40px;
-  max-width:1120px;margin:0 auto;user-select:none;-webkit-user-select:none;
+  max-width:1360px;margin:0 auto;user-select:none;-webkit-user-select:none;
 }
 
 /* ── Header ── */
@@ -66,7 +66,7 @@ h1{font-family:'Cormorant Garamond',serif;font-size:clamp(15px,2.2vw,21px);
 @keyframes fadein{from{opacity:0}to{opacity:1}}
 
 /* ── 3-column layout ── */
-.game-layout{display:grid;grid-template-columns:1fr 90px 1fr;gap:10px;align-items:start}
+.game-layout{display:grid;grid-template-columns:1fr 155px 1fr;gap:10px;align-items:start}
 @media(max-width:680px){
   .game-layout{grid-template-columns:1fr}
   .center-col{order:-1}
@@ -98,7 +98,7 @@ h1{font-family:'Cormorant Garamond',serif;font-size:clamp(15px,2.2vw,21px);
 .board.stuck .done-badge{display:inline}
 
 /* Stock + Hand row */
-.board-top{display:flex;gap:6px;align-items:flex-end}
+.board-top{display:flex;gap:9px;align-items:flex-end}
 .board-top.rev{flex-direction:row-reverse}
 .col-grp{display:flex;flex-direction:column;align-items:center;gap:3px}
 .col-lbl{font-size:7px;letter-spacing:.12em;color:var(--muted);text-align:center}
@@ -106,7 +106,7 @@ h1{font-family:'Cormorant Garamond',serif;font-size:clamp(15px,2.2vw,21px);
 .col-cnt{font-size:7px;color:var(--muted);text-align:center}
 
 /* Stock button */
-.stock-btn{width:var(--cw);height:var(--ch);border-radius:5px;border:1.5px solid;
+.stock-btn{width:var(--cw);height:var(--ch);border-radius:7px;border:1.5px solid;
            display:flex;align-items:center;justify-content:center;
            font-size:18px;cursor:pointer;touch-action:manipulation;
            transition:border-color .15s,box-shadow .15s}
@@ -124,14 +124,14 @@ h1{font-family:'Cormorant Garamond',serif;font-size:clamp(15px,2.2vw,21px);
 .center-col{display:flex;flex-direction:column;align-items:center;gap:14px;padding-top:26px}
 .ctr-section{display:flex;flex-direction:column;align-items:center;gap:5px}
 .ctr-lbl{font-size:7px;letter-spacing:.18em;color:var(--muted);text-transform:uppercase}
-.fnd-grid{display:grid;grid-template-columns:repeat(2,var(--cw));gap:5px}
+.fnd-grid{display:grid;grid-template-columns:repeat(2,var(--cw));gap:6px}
 
 /* ── Tableau columns ── */
-.columns{display:flex;gap:4px;align-items:flex-start;min-height:500px}
+.columns{display:flex;gap:6px;align-items:flex-start;min-height:720px}
 .col-wrap{position:relative;width:var(--cw);flex-shrink:0}
 
 /* ── Cards ── */
-.card{position:absolute;width:var(--cw);height:var(--ch);border-radius:5px;
+.card{position:absolute;width:var(--cw);height:var(--ch);border-radius:7px;
       cursor:grab;touch-action:none;-webkit-tap-highlight-color:transparent;
       transition:box-shadow .1s,opacity .15s}
 .card.inline{position:relative;display:flex;flex-shrink:0}
@@ -149,8 +149,8 @@ h1{font-family:'Cormorant Garamond',serif;font-size:clamp(15px,2.2vw,21px);
 .card.face-up{
   background:var(--card-bg);border:1.5px solid #c8b99a;
   box-shadow:0 2px 6px var(--card-sh);display:flex;flex-direction:column;
-  justify-content:space-between;padding:3px 4px;
-  font-family:'Cormorant Garamond',serif;font-size:12px;font-weight:700;line-height:1.15
+  justify-content:space-between;padding:5px 7px;
+  font-family:'Cormorant Garamond',serif;font-size:18px;font-weight:700;line-height:1.15
 }
 .card.face-up.red{color:var(--red)}
 .card.face-up.black{color:var(--bluecol)}
@@ -158,7 +158,7 @@ h1{font-family:'Cormorant Garamond',serif;font-size:clamp(15px,2.2vw,21px);
   box-shadow:0 0 0 2px rgba(200,168,75,.5),0 2px 8px var(--card-sh)}
 .card.face-up.sel-stack{background:#fffcf2;
   box-shadow:0 0 0 1px rgba(200,168,75,.3),0 2px 6px var(--card-sh)}
-.card-mid{text-align:center;font-size:18px;line-height:1}
+.card-mid{text-align:center;font-size:27px;line-height:1}
 .card-bot{text-align:right;transform:rotate(180deg)}
 
 /* Blocked card — X overlay */
@@ -166,13 +166,13 @@ h1{font-family:'Cormorant Garamond',serif;font-size:clamp(15px,2.2vw,21px);
 .card.blocked::before{
   content:'✕';position:absolute;inset:0;
   display:flex;align-items:center;justify-content:center;
-  font-size:24px;font-weight:900;color:rgba(210,40,40,.9);
+  font-size:36px;font-weight:900;color:rgba(210,40,40,.9);
   font-family:'Courier Prime',monospace;pointer-events:none;z-index:2;
   background:rgba(60,0,0,.1);border-radius:4px;
 }
 
 /* Empty slot */
-.slot{width:var(--cw);height:var(--ch);border-radius:5px;border:1.5px dashed;
+.slot{width:var(--cw);height:var(--ch);border-radius:7px;border:1.5px dashed;
       cursor:pointer;flex-shrink:0;display:flex;align-items:center;justify-content:center;
       font-size:18px;font-family:'Cormorant Garamond',serif;transition:border-color .15s,background .15s}
 .board.non .slot{border-color:rgba(224,85,85,.25);color:rgba(224,85,85,.2)}
@@ -189,7 +189,7 @@ h1{font-family:'Cormorant Garamond',serif;font-size:clamp(15px,2.2vw,21px);
 #ghost{position:fixed;pointer-events:none;z-index:9999;display:none;
        transform-origin:top left;filter:drop-shadow(0 8px 24px rgba(0,0,0,.6))}
 #ghost .card{position:relative!important;display:flex!important;
-             pointer-events:none;opacity:1!important;margin-bottom:-36px}
+             pointer-events:none;opacity:1!important;margin-bottom:-54px}
 #ghost .card:last-child{margin-bottom:0}
 
 /* ── Buttons ── */
@@ -1101,7 +1101,7 @@ function render(){
     if((bd.stock.length||canReshuffle)&&isActive) sb.addEventListener('click',()=>clickStock(bi));
     if(canReshuffle){
       const ico=document.createElement('span'); ico.textContent='↺';
-      ico.style.cssText='font-size:22px;color:var(--muted)'; sb.appendChild(ico);
+      ico.style.cssText='font-size:33px;color:var(--muted)'; sb.appendChild(ico);
     }
     const sc2=document.createElement('div'); sc2.className='col-cnt';
     sc2.textContent=bd.stock.length?bd.stock.length+' carte'+(bd.stock.length>1?'s':''):
@@ -1147,7 +1147,7 @@ function render(){
         wrap.style.height='var(--ch)'; wrap.appendChild(s);
         colsEl.appendChild(wrap); return;
       }
-      let h=0; col.forEach((c,i)=>{h+=i<col.length-1?(c.faceUp?32:17):68;});
+      let h=0; col.forEach((c,i)=>{h+=i<col.length-1?(c.faceUp?48:26):102;});
       wrap.style.height=Math.max(h,68)+'px';
       let y=0;
       col.forEach((card,i)=>{
@@ -1170,7 +1170,7 @@ function render(){
           const k=srcKey(csrc); if(!DSM.has(k))DSM.set(k,[]); DSM.get(k).push(el);
         }
         wrap.appendChild(el);
-        if(!isTop) y+=card.faceUp?32:17;
+        if(!isTop) y+=card.faceUp?48:26;
       });
       colsEl.appendChild(wrap);
     });
