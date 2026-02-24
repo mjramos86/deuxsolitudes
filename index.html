@@ -829,41 +829,75 @@ function clickFoundation(fi){
 }
 
 // ═══════════════════════════════════════════════════════
-//  SCOREBOARD
+//  FIREBASE CONFIG & SCOREBOARD
 // ═══════════════════════════════════════════════════════
-let lastSaved=-1;
-const SCORE_KEY='deux-solitudes-v3';
+const FB_URL = 'https://deux-solitudes-default-rtdb.firebaseio.com/scores';
+let lastSavedName = '';
+
+// Read all scores from Firebase, return sorted array
+async function fbReadScores(){
+  try {
+    const res = await fetch(FB_URL + '.json');
+    if(!res.ok) return [];
+    const data = await res.json();
+    if(!data) return [];
+    // Firebase returns an object {key: entry, ...} — convert to array
+    return Object.values(data).sort((a,b)=>a.ecart-b.ecart||a.time-b.time);
+  } catch(_){ return []; }
+}
+
+// Push one entry to Firebase (POST = auto-generated unique key, safe for concurrent users)
+async function fbPushScore(entry){
+  await fetch(FB_URL + '.json', {
+    method: 'POST',
+    headers: {'Content-Type': 'application/json'},
+    body: JSON.stringify(entry)
+  });
+}
 
 async function loadScoreboard(){
-  let e=[];
-  try{const r=await window.storage.get(SCORE_KEY,true);if(r)e=JSON.parse(r.value);}catch(_){}
+  const e = await fbReadScores();
   renderSB(e);
 }
+
 async function saveScore(){
-  const name=document.getElementById('go-name').value.trim();
+  const name = document.getElementById('go-name').value.trim();
   if(!name) return;
-  const btn=document.getElementById('go-save-btn'); btn.disabled=true;
-  const gT=G.scores[0]+G.scores[1]; const ecartPctSave=gT>0?+(Math.abs(G.scores[0]-G.scores[1])/gT*100).toFixed(1):0;
-  const entry={name,ecart:ecartPctSave,time:G.elapsed,
-               date:new Date().toLocaleDateString('fr-CA')};
-  let e=[];
-  try{const r=await window.storage.get(SCORE_KEY,true);if(r)e=JSON.parse(r.value);}catch(_){}
-  e.push(entry); e.sort((a,b)=>a.ecart-b.ecart||a.time-b.time);
-  if(e.length>20)e=e.slice(0,20);
-  lastSaved=e.indexOf(entry);
-  try{await window.storage.set(SCORE_KEY,JSON.stringify(e),true);}catch(_){}
-  renderSB(e); renderLiveSB(e); btn.textContent='✓ Sauvé';
+  const btn = document.getElementById('go-save-btn');
+  btn.disabled = true;
+  btn.textContent = 'Envoi…';
+  const gT = G.scores[0]+G.scores[1];
+  const ecartPctSave = gT>0 ? +(Math.abs(G.scores[0]-G.scores[1])/gT*100).toFixed(1) : 0;
+  const entry = {
+    name,
+    ecart: ecartPctSave,
+    time: G.elapsed,
+    date: new Date().toLocaleDateString('fr-CA')
+  };
+  try {
+    await fbPushScore(entry);
+    lastSavedName = name;
+    btn.textContent = '✓ Sauvé';
+  } catch(_){
+    btn.textContent = 'Erreur réseau';
+    btn.disabled = false;
+    return;
+  }
+  const e = await fbReadScores();
+  renderSB(e);
+  renderLiveSB(e);
 }
+
 function renderSB(e){
-  const tbody=document.getElementById('sb-body'); tbody.innerHTML='';
-  if(!e.length){
-    tbody.innerHTML='<tr><td colspan="4" style="text-align:center;color:var(--muted);padding:10px">Aucun score</td></tr>';
+  const tbody = document.getElementById('sb-body'); tbody.innerHTML = '';
+  if(!e||!e.length){
+    tbody.innerHTML = '<tr><td colspan="4" style="text-align:center;color:var(--muted);padding:10px">Aucun score</td></tr>';
     return;
   }
   e.slice(0,10).forEach((en,i)=>{
-    const tr=document.createElement('tr');
-    if(i===lastSaved)tr.className='hl';
-    tr.innerHTML=`<td class="rk">${i+1}</td><td>${en.name}</td><td class="ec">${en.ecart}pp</td><td class="tm">${fmtTime(en.time)}</td>`;
+    const tr = document.createElement('tr');
+    if(en.name===lastSavedName) tr.className='hl';
+    tr.innerHTML = `<td class="rk">${i+1}</td><td>${en.name}</td><td class="ec">${en.ecart}pp</td><td class="tm">${fmtTime(en.time)}</td>`;
     tbody.appendChild(tr);
   });
 }
@@ -1169,8 +1203,7 @@ function renderLiveSB(entries){
 }
 
 async function loadLiveSB(){
-  let e=[];
-  try{const r=await window.storage.get(SCORE_KEY,true);if(r)e=JSON.parse(r.value);}catch(_){}
+  const e = await fbReadScores();
   renderLiveSB(e);
 }
 
